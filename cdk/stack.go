@@ -52,7 +52,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props *WebsiteStackP
 		},
 	})
 	// Add a Function URL.
-	lambdaURL := f.AddFunctionUrl(&awslambda.FunctionUrlOptions{
+	lambdaURL := fEdge.AddFunctionUrl(&awslambda.FunctionUrlOptions{
 		AuthType: awslambda.FunctionUrlAuthType_NONE,
 	})
 	awscdk.NewCfnOutput(stack, jsii.String("lambdaFunctionUrl"), &awscdk.CfnOutputProps{
