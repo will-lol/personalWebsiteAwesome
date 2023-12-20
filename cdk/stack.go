@@ -1,8 +1,7 @@
-package main
+package cdk
 
 import (
 	"fmt"
-
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfront"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfront/experimental"
@@ -10,10 +9,9 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awss3assets"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3deployment"
-	awslambdago "github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
 	"github.com/aws/constructs-go/constructs/v10"
-	"path"
 	"github.com/aws/jsii-runtime-go"
 )
 
@@ -28,28 +26,13 @@ func NewWebsiteStack(scope constructs.Construct, id string, props *WebsiteStackP
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	// Strip the binary, and remove the deprecated Lambda SDK RPC code for performance.
-	// These options are not required, but make cold start faster.
-	bundlingOptions := &awslambdago.BundlingOptions{
-		GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w" -tags lambda.norpc`)},
-	}
 	fEdge := experimental.NewEdgeFunction(stack, jsii.String("handler"), &experimental.EdgeFunctionProps{
-		Runtime: awslambda.Runtime_PROVIDED_AL2(),
-		MemorySize: jsii.Number(1024),
-		Architecture: awslambda.Architecture_ARM_64(),
-		Code: awslambda.Code_FromAsset(path.Join(__dirname, jsii.String("main"))),
-		Handler: jsii.String("main"),
-		Environment: &map[string]*string{
-		}, 
-	})
-	f := awslambdago.NewGoFunction(stack, jsii.String("handler"), &awslambdago.GoFunctionProps{
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		MemorySize:   jsii.Number(1024),
 		Architecture: awslambda.Architecture_ARM_64(),
-		Entry:        jsii.String("../"),
-		Bundling:     bundlingOptions,
-		Environment: &map[string]*string{
-		},
+		Code:         awslambda.Code_FromAsset(jsii.String("../main"), &awss3assets.AssetOptions{}),
+		Handler:      jsii.String("main"),
+		Environment:  &map[string]*string{},
 	})
 	// Add a Function URL.
 	lambdaURL := fEdge.AddFunctionUrl(&awslambda.FunctionUrlOptions{
@@ -126,6 +109,12 @@ func NewWebsiteStack(scope constructs.Construct, id string, props *WebsiteStackP
 func main() {
 	defer jsii.Close()
 	app := awscdk.NewApp(nil)
-	NewWebsiteStack(app, "WebsiteStack", &WebsiteStackProps{})
+	NewWebsiteStack(app, "WebsiteStack", &WebsiteStackProps{
+		StackProps: awscdk.StackProps{
+			Env: &awscdk.Environment{
+				Region: jsii.String("ap-southeast-2"),
+			},
+		},
+	})
 	app.Synth(nil)
 }

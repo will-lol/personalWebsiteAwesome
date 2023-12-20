@@ -1,0 +1,14 @@
+package components
+
+templ Nav() {
+	<nav class="bg-warm-100 border-b border-warm-200 border-solid top-0 flex flex-row w-full justify-between items-center py-1 px-2 gap-2 overflow-scroll">
+		<div class="font-serif whitespace-nowrap text-2xl font-bold">
+			W. Bradshaw	
+		</div>
+		<div class="flex flex-row gap-2">
+			@A(templ.URL("/")) { Home }
+			@A(templ.URL("blog")) { Blog }
+			@A(templ.URL("contact")) { Contact }
+		</div>
+	</nav>
+}

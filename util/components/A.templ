@@ -1,0 +1,36 @@
+package components
+
+import (
+	"net/url"
+	"log"
+	"errors"
+)
+
+func standardiseURL(urlString string) string {
+	url, err := url.Parse(urlString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return url.String()
+}
+
+func GetURL(ctx context.Context) (*url.URL, error) {
+	if req, ok := ctx.Value("url").(*url.URL); ok {
+		return req, nil
+	}
+	return nil, errors.New("couldn't get url")
+}
+
+func getCurrentUrl(ctx context.Context) string {
+	url, err := GetURL(ctx)
+	if err != nil { 
+		log.Fatal(err)
+	}
+	return url.String()
+}
+
+templ A(href templ.SafeURL) {
+	<a class={ "text-warm-800", templ.KV("underline", standardiseURL(string(href)) == getCurrentUrl(ctx)) } href={ href }>
+		{ children... }
+	</a>
+}

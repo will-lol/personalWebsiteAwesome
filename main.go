@@ -1,17 +1,27 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
+	"log"
+	"os"
+	"context"
+	"time"
+
 	"github.com/akrylysov/algnhsa"
 	"github.com/go-chi/chi/v5"
-	"net/http"
-	"os"
 	"github.com/will-lol/personal_website/index"
-	"time"
-)
+) 
+
+func url_middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "url", r.URL)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
 
 func main() {
 	router := chi.NewRouter()
+	router.Use(url_middleware)
 	router.Route("/", index.Router) 
 
 	env := os.Getenv("ENVIRONMENT")
@@ -23,7 +33,7 @@ func main() {
 			ReadTimeout:  time.Second * 10,
 			WriteTimeout: time.Second * 10,
 		}
-		fmt.Printf("Listening on %v\n", server.Addr)
+		log.Printf("Listening on %v\n", server.Addr)
 		server.ListenAndServe()
 	} else {
 		algnhsa.ListenAndServe(router, nil)
