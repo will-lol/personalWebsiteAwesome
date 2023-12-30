@@ -7,5 +7,9 @@ import (
 templ index(message string) {
 	@components.Layout("Home") {
 		<div>{ message }</div>
+		@components.Button(templ.Attributes{"id": "notifications"}) {
+			click for notifications
+		}
+		<script type="module" src="assets/js/register.js"/>
 	}
 }

@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
-    templRepo.url = "github:a-h/templ";
+    templRepo.url = "github:a-h/templ/refs/tags/v0.2.501";
   };
 
   outputs = { self, nixpkgs, flake-utils, templRepo }:
@@ -20,7 +20,7 @@
 	  src = ./.;
 	  CGO_ENABLED = 0;
 	  ldflags = ["-s -w"];
-	  vendorHash = "sha256-vWzrKaNEAltBGlDQUbf6Z34AzgkliVW2G5ttnWUBLPY=";
+	  vendorHash = "sha256-BQrz/+1KopDxZr2ZmvoFXL36cwCdBJMsemkRsFFl9VM=";
 	  preBuild = ''
 	    ${templ}/bin/templ generate
 	  '';

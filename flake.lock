@@ -114,15 +114,16 @@
         "xc": "xc"
       },
       "locked": {
-        "lastModified": 1702883868,
-        "narHash": "sha256-Enk48ng4b+tbyAwrZaxacszHJdSrVhoDb7otIX/cHvQ=",
+        "lastModified": 1703263828,
+        "narHash": "sha256-MkSGQZo2Zv6aCVANh2ETXoCXETkp+xk8jWAW4Wj+y2s=",
         "owner": "a-h",
         "repo": "templ",
-        "rev": "d61470219c74a0bfc3a2a7f18f937fd943b68c30",
+        "rev": "92557cd1c50153da439fce00944519dd6038f9f4",
         "type": "github"
       },
       "original": {
         "owner": "a-h",
+        "ref": "refs/tags/v0.2.501",
         "repo": "templ",
         "type": "github"
       }

@@ -10,6 +10,7 @@ import (
 	"github.com/akrylysov/algnhsa"
 	"github.com/go-chi/chi/v5"
 	"github.com/will-lol/personal_website/index"
+	"github.com/will-lol/personal_website/api"
 ) 
 
 func url_middleware(next http.Handler) http.Handler {
@@ -23,6 +24,7 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(url_middleware)
 	router.Route("/", index.Router) 
+	router.Route("/api", api.Router)
 
 	env := os.Getenv("ENVIRONMENT")
 	if env == "dev" {

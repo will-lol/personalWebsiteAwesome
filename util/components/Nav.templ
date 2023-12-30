@@ -6,9 +6,9 @@ templ Nav() {
 			W. Bradshaw	
 		</div>
 		<div class="flex flex-row gap-2">
-			@A(templ.URL("/")) { Home }
-			@A(templ.URL("blog")) { Blog }
-			@A(templ.URL("contact")) { Contact }
+			@NavLink(templ.URL("/")) { Home }
+			@NavLink(templ.URL("blog")) { Blog }
+			@NavLink(templ.URL("contact")) { Contact }
 		</div>
 	</nav>
 }

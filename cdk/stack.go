@@ -1,47 +1,68 @@
-package cdk
+package main
 
 import (
 	"fmt"
+
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfront"
-	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfront/experimental"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfrontorigins"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3"
-	"github.com/aws/aws-cdk-go/awscdk/v2/awss3assets"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3deployment"
+	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 )
 
-type WebsiteStackProps struct {
-	awscdk.StackProps
+type CommandHook struct {}
+func (t CommandHook) BeforeBundling(inputDir *string, outputDir *string) *[]*string {
+	command1 := "templ generate"
+	command2 := "npx tailwindcss -i ./tailwind.css -o ./assets/css/main.css"
+	return &[]*string{&command1, &command2}
+}
+func (t CommandHook) AfterBundling(inputDir *string, outputDir *string) *[]*string {
+	return &[]*string{}
 }
 
-func NewWebsiteStack(scope constructs.Construct, id string, props *WebsiteStackProps) awscdk.Stack {
-	var sprops awscdk.StackProps
-	if props != nil {
-		sprops = props.StackProps
-	}
-	stack := awscdk.NewStack(scope, &id, &sprops)
+func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackProps) awscdk.Stack {
+	stack := awscdk.NewStack(scope, &id, &props)
 
-	fEdge := experimental.NewEdgeFunction(stack, jsii.String("handler"), &experimental.EdgeFunctionProps{
-		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		MemorySize:   jsii.Number(1024),
+	f := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("handler"), &awscdklambdagoalpha.GoFunctionProps{
+		Entry: jsii.String("../"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			CommandHooks: &CommandHook{},
+		},
 		Architecture: awslambda.Architecture_ARM_64(),
-		Code:         awslambda.Code_FromAsset(jsii.String("../main"), &awss3assets.AssetOptions{}),
-		Handler:      jsii.String("main"),
-		Environment:  &map[string]*string{},
 	})
 	// Add a Function URL.
-	lambdaURL := fEdge.AddFunctionUrl(&awslambda.FunctionUrlOptions{
+	lambda_url := f.AddFunctionUrl(&awslambda.FunctionUrlOptions{
 		AuthType: awslambda.FunctionUrlAuthType_NONE,
 	})
 	awscdk.NewCfnOutput(stack, jsii.String("lambdaFunctionUrl"), &awscdk.CfnOutputProps{
 		ExportName: jsii.String("lambdaFunctionUrl"),
-		Value:      lambdaURL.Url(),
+		Value:      lambda_url.Url(),
 	})
+
+	subscriptions := awsdynamodb.NewTable(stack, jsii.String("subscriptions"), &awsdynamodb.TableProps{
+		PartitionKey: &awsdynamodb.Attribute{
+			Name: jsii.String("_pk"),
+			Type: awsdynamodb.AttributeType_STRING,
+		},
+		BillingMode: awsdynamodb.BillingMode_PAY_PER_REQUEST,
+		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
+	})
+	metadata := awsdynamodb.NewTable(stack, jsii.String("metadata"), &awsdynamodb.TableProps{
+		PartitionKey: &awsdynamodb.Attribute{
+			Name: jsii.String("_pk"),
+			Type: awsdynamodb.AttributeType_STRING,
+		},
+		BillingMode: awsdynamodb.BillingMode_PAY_PER_REQUEST,
+		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
+	})
+	metadata.GrantFullAccess(f)
+	subscriptions.GrantFullAccess(f)
 
 	assetsBucket := awss3.NewBucket(stack, jsii.String("assets"), &awss3.BucketProps{
 		BlockPublicAccess: awss3.BlockPublicAccess_BLOCK_ALL(),
@@ -62,7 +83,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props *WebsiteStackP
 	assetsBucket.AddToResourcePolicy(cfs)
 
 	// Add a CloudFront distribution to route between the public directory and the Lambda function URL.
-	lambdaURLDomain := awscdk.Fn_Select(jsii.Number(2), awscdk.Fn_Split(jsii.String("/"), lambdaURL.Url(), nil))
+	lambdaURLDomain := awscdk.Fn_Select(jsii.Number(2), awscdk.Fn_Split(jsii.String("/"), lambda_url.Url(), nil))
 	lambdaOrigin := awscloudfrontorigins.NewHttpOrigin(lambdaURLDomain, &awscloudfrontorigins.HttpOriginProps{
 		ProtocolPolicy: awscloudfront.OriginProtocolPolicy_HTTPS_ONLY,
 	})
@@ -75,7 +96,6 @@ func NewWebsiteStack(scope constructs.Construct, id string, props *WebsiteStackP
 			CachePolicy:          awscloudfront.CachePolicy_CACHING_DISABLED(),
 			ViewerProtocolPolicy: awscloudfront.ViewerProtocolPolicy_REDIRECT_TO_HTTPS,
 		},
-		PriceClass: awscloudfront.PriceClass_PRICE_CLASS_100,
 	})
 
 	// Add /assets* to the distribution backed by S3.
@@ -109,11 +129,9 @@ func NewWebsiteStack(scope constructs.Construct, id string, props *WebsiteStackP
 func main() {
 	defer jsii.Close()
 	app := awscdk.NewApp(nil)
-	NewWebsiteStack(app, "WebsiteStack", &WebsiteStackProps{
-		StackProps: awscdk.StackProps{
-			Env: &awscdk.Environment{
-				Region: jsii.String("ap-southeast-2"),
-			},
+	NewWebsiteStack(app, "WebsiteStack", awscdk.StackProps{
+		Env: &awscdk.Environment{
+			Region: jsii.String("ap-southeast-2"),
 		},
 	})
 	app.Synth(nil)
