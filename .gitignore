@@ -1,4 +1,6 @@
 .git
 cdk/cdk.out
 result
+assets/css/*
+js/*
 
