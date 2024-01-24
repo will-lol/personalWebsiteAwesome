@@ -1,0 +1,17 @@
+{
+  "name": "W. Bradshaw",
+  "description": "My personal website.",
+  "short_name": "Bradshaw",
+  "start_url": "/",
+  "lang": "en-AU",
+  "theme_color": "#fff8f1",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "assets/images/logo.svg",
+      "sizes": "all",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfront"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfrontorigins"
@@ -11,16 +9,18 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3deployment"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awssecretsmanager"
 	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
+	"fmt"
 )
 
-type CommandHook struct {}
+type CommandHook struct{}
+
 func (t CommandHook) BeforeBundling(inputDir *string, outputDir *string) *[]*string {
-	command1 := "templ generate"
-	command2 := "npx tailwindcss -i ./tailwind.css -o ./assets/css/main.css"
-	return &[]*string{&command1, &command2}
+	command1 := "./prebuild.sh"
+	return &[]*string{&command1}
 }
 func (t CommandHook) AfterBundling(inputDir *string, outputDir *string) *[]*string {
 	return &[]*string{}
@@ -29,13 +29,42 @@ func (t CommandHook) AfterBundling(inputDir *string, outputDir *string) *[]*stri
 func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackProps) awscdk.Stack {
 	stack := awscdk.NewStack(scope, &id, &props)
 
+	subscriptions := awsdynamodb.NewTable(stack, jsii.String("subscriptions"), &awsdynamodb.TableProps{
+		PartitionKey: &awsdynamodb.Attribute{
+			Name: jsii.String("Endpoint"),
+			Type: awsdynamodb.AttributeType_STRING,
+		},
+		BillingMode:   awsdynamodb.BillingMode_PAY_PER_REQUEST,
+		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
+	})
+	metadata := awsdynamodb.NewTable(stack, jsii.String("metadata"), &awsdynamodb.TableProps{
+		PartitionKey: &awsdynamodb.Attribute{
+			Name: jsii.String("ID"),
+			Type: awsdynamodb.AttributeType_STRING,
+		},
+		BillingMode:   awsdynamodb.BillingMode_PAY_PER_REQUEST,
+		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
+	})
+
+	secretArn := "arn:aws:secretsmanager:ap-southeast-2:301436506805:secret:website/vapid-keys-WIfxAO"
+	a := awssecretsmanager.Secret_FromSecretCompleteArn(stack, jsii.String("SecretFromCompleteArn"), jsii.String(secretArn))
+
 	f := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("handler"), &awscdklambdagoalpha.GoFunctionProps{
 		Entry: jsii.String("../"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			CommandHooks: &CommandHook{},
 		},
 		Architecture: awslambda.Architecture_ARM_64(),
+		Environment: &map[string]*string{
+			"SUBSCRIPTIONS_TABLE_NAME": subscriptions.TableName(),
+			"METADATA_TABLE_NAME":      metadata.TableName(),
+			"SECRET_ARN":								&secretArn,
+		},
+		ParamsAndSecrets: awslambda.ParamsAndSecretsLayerVersion_FromVersion(awslambda.ParamsAndSecretsVersions_V1_0_103, &awslambda.ParamsAndSecretsOptions{}),
 	})
+
+	a.GrantRead(f, nil)
+
 	// Add a Function URL.
 	lambda_url := f.AddFunctionUrl(&awslambda.FunctionUrlOptions{
 		AuthType: awslambda.FunctionUrlAuthType_NONE,
@@ -45,22 +74,6 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 		Value:      lambda_url.Url(),
 	})
 
-	subscriptions := awsdynamodb.NewTable(stack, jsii.String("subscriptions"), &awsdynamodb.TableProps{
-		PartitionKey: &awsdynamodb.Attribute{
-			Name: jsii.String("_pk"),
-			Type: awsdynamodb.AttributeType_STRING,
-		},
-		BillingMode: awsdynamodb.BillingMode_PAY_PER_REQUEST,
-		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
-	})
-	metadata := awsdynamodb.NewTable(stack, jsii.String("metadata"), &awsdynamodb.TableProps{
-		PartitionKey: &awsdynamodb.Attribute{
-			Name: jsii.String("_pk"),
-			Type: awsdynamodb.AttributeType_STRING,
-		},
-		BillingMode: awsdynamodb.BillingMode_PAY_PER_REQUEST,
-		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
-	})
 	metadata.GrantFullAccess(f)
 	subscriptions.GrantFullAccess(f)
 

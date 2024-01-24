@@ -36,7 +36,7 @@ func Layout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><script src=\"assets/js/htmx.min.js\"></script><link rel=\"stylesheet\" href=\"assets/css/main.css\"></head><body class=\"relative bg-warm-100 h-[200vh] text-warm-900\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><script src=\"assets/js/htmx.min.js\"></script><script type=\"module\" src=\"assets/js/util/components/sw-register.js\"></script><link rel=\"manifest\" href=\"assets/manifest.webmanifest\"><meta name=\"mobile-web-app-capable\" content=\"yes\"><meta name=\"apple-mobile-web-app-capable\" content=\"yes\"><meta name=\"application-name\" content=\"Bradshaw\"><meta name=\"apple-mobile-web-app-title\" content=\"Bradshaw\"><meta name=\"theme-color\" content=\"#fff8f1\"><meta name=\"msapplication-navbutton-color\" content=\"#fff8f1\"><meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black-translucent\"><meta name=\"msapplication-starturl\" content=\"/\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"><link rel=\"icon\" type=\"image/svg+xml\" sizes=\"all\" href=\"assets/images/logo.svg\"><link rel=\"apple-touch-icon\" type=\"image/svg+xml\" sizes=\"all\" href=\"assets/images/logo.svg\"><link rel=\"stylesheet\" href=\"assets/css/main.css\"></head><body class=\"relative bg-warm-100 h-[200vh] text-warm-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

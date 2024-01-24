@@ -1,4 +1,2 @@
-#!/bin/sh
-npx tailwindcss -i ./tailwind.css -o ./assets/css/main.css
-templ generate
+./prebuild.sh
 go run main.go

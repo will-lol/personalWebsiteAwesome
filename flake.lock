@@ -1,5 +1,18 @@
 {
   "nodes": {
+    "aws-cdk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1705716557,
+        "narHash": "sha256-PGfb+QX0oxYXKd3LX4KFbugdvLFP9TBiY6IumlI3O0k=",
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.122.0.tgz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.122.0.tgz"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -56,11 +69,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1703031971,
-        "narHash": "sha256-AHYzHn5C+Etk4jypABL8WwjDLPZtRQIqoUHhSzFKt04=",
+        "lastModified": 1705111192,
+        "narHash": "sha256-YOh/Itc2hzbGoydWm1lPc5wn0uhRHGGo76soOTpToyU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "0ddc9072288db2b7f52fbea324f3bf378762a899",
+        "rev": "5eb4947d79a58abc4420c5778390f90b048054c9",
         "type": "github"
       },
       "original": {
@@ -87,6 +100,7 @@
     },
     "root": {
       "inputs": {
+        "aws-cdk": "aws-cdk",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "templRepo": "templRepo"
