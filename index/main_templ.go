@@ -94,7 +94,40 @@ func index(message string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <script type=\"module\" src=\"assets/js/index/notifications.js\"></script>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <script type=\"module\" src=\"assets/js/index/notifications.js\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var8 := ``
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script> <div class=\"p-2\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.FullWidthCarousel([]components.Photo{
+				{
+					Mobile:  &components.Src{Src: "assets/images/mobile.png", IntrinsicWidth: 1080},
+					Desktop: &components.Src{Src: "assets/images/mobile.png", IntrinsicWidth: 5141},
+					Alt:     "mountain",
+				},
+				{
+					Mobile:  &components.Src{Src: "assets/images/mobile.png", IntrinsicWidth: 1080},
+					Desktop: &components.Src{Src: "assets/images/desktop.jpg", IntrinsicWidth: 5141},
+					Alt:     "mountain",
+				},
+				{
+					Mobile:  &components.Src{Src: "assets/images/mobile.png", IntrinsicWidth: 1080},
+					Desktop: &components.Src{Src: "assets/images/desktop.jpg", IntrinsicWidth: 5141},
+					Alt:     "mountain",
+				},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

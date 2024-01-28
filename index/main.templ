@@ -13,6 +13,25 @@ templ index(message string) {
 		@components.Button(templ.Attributes{"id": "notify"}) {
 			click to notify
 		}
-		<script type="module" src="assets/js/index/notifications.js"/>
+		<script type="module" src="assets/js/index/notifications.js"></script>
+		<div class="p-2">
+			@components.FullWidthCarousel([]components.Photo{
+			{
+				Mobile: &components.Src{Src: "assets/images/mobile.png", IntrinsicWidth: 1080},
+				Desktop: &components.Src{Src: "assets/images/mobile.png", IntrinsicWidth: 5141},
+				Alt: "mountain",
+			},
+			{
+				Mobile: &components.Src{Src: "assets/images/mobile.png", IntrinsicWidth: 1080},
+				Desktop: &components.Src{Src: "assets/images/desktop.jpg", IntrinsicWidth: 5141},
+				Alt: "mountain",
+			},
+			{
+				Mobile: &components.Src{Src: "assets/images/mobile.png", IntrinsicWidth: 1080},
+				Desktop: &components.Src{Src: "assets/images/desktop.jpg", IntrinsicWidth: 5141},
+				Alt: "mountain",
+			},
+		})
+		</div>
 	}
 }

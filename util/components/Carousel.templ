@@ -4,29 +4,42 @@ import (
 	"fmt"
 )
 
-type src struct {
-	src *string
-	intrinsicWidth int
+type Src struct {
+	Src            string
+	IntrinsicWidth int
 }
 
 type Photo struct {
-	desktop *src
-	mobile *src
-	src *string
-	alt string
+	Desktop *Src
+	Mobile  *Src
+	Src     *string
+	Alt     string
 }
 
 templ FullWidthCarousel(photos []Photo) {
-	<div class="w-full">
-		for _, photo := range photos {
-			if photo.src != nil || (photo.desktop == nil || photo.mobile == nil) {
-				<img alt={ templ.EscapeString(photo.alt) } src={ templ.EscapeString(*photo.src) }/>
-			} else {
-				<img 
-					srcset={ fmt.Sprintf("%s %dw, %s %dw", *photo.mobile.src, photo.mobile.intrinsicWidth, *photo.desktop.src, photo.desktop.intrinsicWidth) }
-					sizes={ fmt.Sprintf("(max-width: 768px) %dpx, %dpx", photo.mobile.intrinsicWidth, photo.desktop.intrinsicWidth) }
-					alt={ templ.EscapeString(photo.alt) }/>
+	<div class="overflow-hidden relative">
+		<div class="max-w-none h-[70svh] flex flex-nowrap animate-scroll">
+			for _, photo := range photos {
+				if photo.Src != nil || (photo.Desktop == nil || photo.Mobile == nil) {
+					@noisyImg(templ.Attributes{
+						"alt": templ.EscapeString(photo.Alt),
+						"src": templ.EscapeString(*photo.Src),
+					})
+				} else {
+					@noisyImg(templ.Attributes{
+						"alt": templ.EscapeString(photo.Alt),
+						"srcset": fmt.Sprintf("%s %dw, %s %dw", photo.Mobile.Src, photo.Mobile.IntrinsicWidth, photo.Desktop.Src, photo.Desktop.IntrinsicWidth),
+						"sizes": fmt.Sprintf("(max-width: 640px) %dpx, %dpx", photo.Mobile.IntrinsicWidth, photo.Desktop.IntrinsicWidth),
+					})
+				}
 			}
-		}
+		</div>
+	</div>
+}
+
+templ noisyImg(attrs templ.Attributes) {
+	<div class="relative h-full shrink-0 grow-0">
+		<div class="absolute z-10 opacity-10 pointer-events-none top-0 bottom-0 bg-repeat left-0 right-0 bg-noise"></div>
+		<img class="h-full" { attrs... }/>
 	</div>
 }

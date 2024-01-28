@@ -18,6 +18,18 @@ module.exports = {
           900: "oklch(20% 0.0234 67.74)",
         },
       },
+      animation: {
+        "scroll": "scroll 30s linear infinite"
+      },
+      keyframes: {
+        scroll: {
+          "0%, 80%": { transform: "translateX(0%)" },
+          "30%, 50%": { transform: "translateX(-100%)" }
+        }
+      },
+      backgroundImage: ({ theme }) => ({
+        "noise": "url(\"/assets/images/noise.png\")",
+      }),
     },
     fontFamily: {
       sans: ['Ysabeau', 'Helvetica Neue', 'Arial', 'sans-serif'],
