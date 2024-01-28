@@ -45,7 +45,7 @@
 	  };
 	  defaultPackage = goBuild;
 	  devShell = pkgs.mkShell {
-	    packages = [ pkgs.deno pkgs.fd pkgs.go-task pkgs.nodejs_18 pkgs.awscli2 pkgs.aws-sam-cli pkgs.go pkgs.gopls templ cdk ];
+	    packages = [ pkgs.entr pkgs.deno pkgs.watchman pkgs.fd pkgs.go-task pkgs.nodejs_18 pkgs.awscli2 pkgs.aws-sam-cli pkgs.go pkgs.gopls templ cdk ];
 	    shellHook = ''
 	      export ENVIRONMENT=dev
 	    '';
