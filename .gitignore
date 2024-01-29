@@ -3,4 +3,4 @@ cdk/cdk.out
 result
 assets/css/*
 assets/js/*
-
+*_templ.go
