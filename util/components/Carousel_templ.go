@@ -26,7 +26,44 @@ type Photo struct {
 	Alt     string
 }
 
-func FullWidthCarousel(photos []Photo) templ.Component {
+func animate(id string) templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_animate_e09c`,
+		Function: `function __templ_animate_e09c(id){window.addEventListener("load", () => {
+		const el = document.getElementById(id);
+		let translateWidth = el.scrollWidth - el.offsetWidth;
+		const velocity = 0.015;
+
+		retrun = el.animate([
+			{
+				transform: "translateX(0px)",
+				offset: 0
+			},
+			{
+				transform: ` + "`" + `translateX(-${translateWidth}px)` + "`" + `,
+				offset: 0.3
+			},
+			{
+				transform: ` + "`" + `translateX(-${translateWidth}px)` + "`" + `,
+				offset: 0.5
+			},
+			{
+				transform: ` + "`" + `translateX(0px)` + "`" + `,
+				offset: 0.8
+			}
+		], {
+			duration: translateWidth / velocity,
+			iterations: Infinity
+		});
+
+		console.log(translateWidth);
+	})}`,
+		Call:       templ.SafeScript(`__templ_animate_e09c`, id),
+		CallInline: templ.SafeScriptInline(`__templ_animate_e09c`, id),
+	}
+}
+
+func FullWidthCarousel(photos []Photo, id string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -39,7 +76,15 @@ func FullWidthCarousel(photos []Photo) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"overflow-hidden relative\"><div class=\"max-w-none h-[70svh] flex flex-nowrap animate-scroll\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"overflow-hidden relative\"><div id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(id))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"max-w-none h-[70svh] flex flex-nowrap\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -63,7 +108,15 @@ func FullWidthCarousel(photos []Photo) templ.Component {
 				}
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = animate(id).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
