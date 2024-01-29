@@ -4,9 +4,8 @@ import (
 	"github.com/will-lol/personal_website/util/components"
 )
 
-templ index(message string) {
+templ index() {
 	@components.Layout("Home") {
-		<div>{ message }</div>
 		@components.Button(templ.Attributes{"id": "subscribe"}) {
 			click for notifications
 		}
@@ -31,7 +30,7 @@ templ index(message string) {
 				Desktop: &components.Src{Src: "assets/images/desktop.jpg", IntrinsicWidth: 5141},
 				Alt: "mountain",
 			},
-		})
+		}, GetIdFactory(ctx).CreateEid())
 		</div>
 	}
 }
