@@ -1,0 +1,27 @@
+package components
+
+func appendAttrs(attrs templ.Attributes, appendingAttrs templ.Attributes) templ.Attributes {
+	for k, v := range appendingAttrs {
+		attrs[k] = v
+	}
+	return attrs
+}
+
+templ LoaderButton(attrs templ.Attributes, loadingText string) {
+	@Button(appendAttrs(attrs, templ.Attributes{ "hx-disabled-elt": "this", "hx-swap": "none", "hx-trigger": "click throttle:1s", "hx-on::after-request": "this.classList.remove('htmx-request')"})) {
+		<div id="buttonText">
+			{ children... }
+		</div>
+		<div class="items-center indicator gap-2">
+			{ loadingText }
+			<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" class="animate-spin">
+				<defs>
+					<symbol id="circle">
+						<path d="m8,1a7,7 0 0 0 0,14" stroke-width="1" stroke-linecap="round" stroke="black" fill-opacity="0"></path>
+					</symbol>
+				</defs>
+				<use href="#circle"></use>
+			</svg>
+		</div>
+	}
+}

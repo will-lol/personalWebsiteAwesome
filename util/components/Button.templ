@@ -1,7 +1,7 @@
 package components
 
 templ Button(attrs templ.Attributes) {
-	<button { attrs... } >
+	<button class="px-3 pb-1 disabled:pointer-events-none disabled:opacity-80 bg-warm-200 transition-all hover:bg-warm-100 shadow-sm border border-warm-300 border-solid active:scale-95" { attrs... }>
 		{ children... }
 	</button>
 }
