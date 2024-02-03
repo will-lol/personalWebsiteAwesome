@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/SherClockHolmes/webpush-go v1.3.0
-	github.com/a-h/templ v0.2.501
+	github.com/a-h/templ v0.2.543
 	github.com/akrylysov/algnhsa v1.0.0
 	github.com/aws/aws-cdk-go/awscdk/v2 v2.122.0
 	github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2 v2.122.0-alpha.0
