@@ -5,8 +5,9 @@ templ Layout(title string) {
 	<html>
 		<head>
 			<title>{ title + "—W. Bradshaw" }</title>
-			<script src="assets/js/htmx.min.js"/>
-			<script type="module" src="assets/js/util/components/sw-register.js"/>
+			<script src="assets/js/htmx.min.js"></script>
+			<script type="module" src="assets/js/util/components/sw-register.js"></script>
+			<script type="module" src="assets/js/util/errors.js"></script>
 			<link rel="manifest" href="assets/manifest.webmanifest"/>
 			<meta name="mobile-web-app-capable" content="yes"/>
 			<meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -21,7 +22,8 @@ templ Layout(title string) {
 			<link rel="apple-touch-icon" type="image/svg+xml" sizes="all" href="assets/images/logo.svg"/>
 			<link rel="stylesheet" href="assets/css/main.css"/>
 		</head>
-		<body class="relative bg-warm-100 h-[200vh] text-warm-900">
+		<body hx-ext="loading-states" class="relative bg-warm-100 h-[200vh] text-warm-900">
+			<div id="errors"></div>
 			@Nav()
 			{ children... }
 			@Footer()
