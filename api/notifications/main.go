@@ -122,7 +122,7 @@ func notifyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func notifySubscriber(sub webpush.Subscription, vapidPub string, vapidPriv string) error {
-	resp, err := webpush.SendNotification([]byte("You have been BONKED!"), &sub, &webpush.Options{
+	resp, err := webpush.SendNotification([]byte("Notification received"), &sub, &webpush.Options{
 		VAPIDPublicKey:  vapidPub,
 		VAPIDPrivateKey: vapidPriv,
 		TTL:             64,
