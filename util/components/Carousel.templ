@@ -19,60 +19,55 @@ type Photo struct {
 script animate(id string) {
 	window.addEventListener("load", () => {
 		const el = document.getElementById(id);
-		let translateWidth = el.scrollWidth - el.offsetWidth;
-		const velocity = 0.015;
+		let translateWidth = el.scrollWidth / 2;
+		const velocity = 0.100;
 
 		retrun = el.animate([
 			{
 				transform: "translateX(0px)",
-				offset: 0
 			},
 			{
 				transform: `translateX(-${translateWidth}px)`,
-				offset: 0.3
 			},
-			{
-				transform: `translateX(-${translateWidth}px)`,
-				offset: 0.5
-			},
-			{
-				transform: `translateX(0px)`,
-				offset: 0.8
-			}
 		], {
 			duration: translateWidth / velocity,
 			iterations: Infinity
 		});
-
-		console.log(translateWidth);
 	})
 }
 
 templ FullWidthCarousel(photos []Photo, id string) {
 	<div class="overflow-hidden relative">
-		<div id={ id } class="max-w-none h-[70svh] flex flex-nowrap">
-			for _, photo := range photos {
-				if photo.Src != nil || (photo.Desktop == nil || photo.Mobile == nil) {
-					@noisyImg(templ.Attributes{
-						"alt": templ.EscapeString(photo.Alt),
-						"src": templ.EscapeString(*photo.Src),
-					})
-				} else {
-					@noisyImg(templ.Attributes{
-						"alt": templ.EscapeString(photo.Alt),
-						"srcset": fmt.Sprintf("%s %dw, %s %dw", photo.Mobile.Src, photo.Mobile.IntrinsicWidth, photo.Desktop.Src, photo.Desktop.IntrinsicWidth),
-						"sizes": fmt.Sprintf("(max-width: 640px) %dpx, %dpx", photo.Mobile.IntrinsicWidth, photo.Desktop.IntrinsicWidth),
-					})
-				}
-			}
+		{ children... }
+		<div class="z-10 absolute inset-0 bg-vignette"/>
+		<div id={ id } class="max-w-none h-[80svh] flex flex-nowrap">
+			@images(photos)
+			@images(photos)
 		</div>
 		@animate(id)
 	</div>
 }
 
+templ images(photos []Photo) {
+	for _, photo := range photos {
+		if photo.Src != nil || (photo.Desktop == nil || photo.Mobile == nil) {
+			@noisyImg(templ.Attributes{
+						"alt": templ.EscapeString(photo.Alt),
+						"src": templ.EscapeString(*photo.Src),
+					})
+		} else {
+			@noisyImg(templ.Attributes{
+						"alt": templ.EscapeString(photo.Alt),
+						"srcset": fmt.Sprintf("%s %dw, %s %dw", photo.Mobile.Src, photo.Mobile.IntrinsicWidth, photo.Desktop.Src, photo.Desktop.IntrinsicWidth),
+						"sizes": fmt.Sprintf("(max-width: 640px) %dpx, %dpx", photo.Mobile.IntrinsicWidth, photo.Desktop.IntrinsicWidth),
+					})
+		}
+	}
+}
+
 templ noisyImg(attrs templ.Attributes) {
 	<div class="relative h-full shrink-0 grow-0">
-		<div class="absolute z-10 opacity-10 pointer-events-none top-0 bottom-0 bg-repeat left-0 right-0 bg-noise"></div>
+		<div class="absolute z-10 opacity-10 pointer-events-none bg-repeat inset-0 bg-noise"></div>
 		<img class="h-full" { attrs... }/>
 	</div>
 }
