@@ -10,7 +10,3 @@ document.getElementById("subscribe").addEventListener('click', async (e) => {
     body: JSON.stringify(subscription.toJSON()),
   });
 })
-
-document.getElementById("notify").addEventListener('click', async (e) => {
-  fetch("api/notifications/notify")
-})
