@@ -1,0 +1,30 @@
+package components
+
+import (
+	"net/url"
+	"log"
+	urlService "github.com/will-lol/personalWebsiteAwesome/services/url"
+	"github.com/will-lol/personalWebsiteAwesome/eid"
+)
+
+func standardiseURL(urlString string) string {
+	url, err := url.Parse(urlString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return url.String()
+}
+
+func getCurrentUrl(ctx context.Context) string {
+	url, err := urlService.GetURL(ctx)
+	if err != nil { 
+		log.Fatal(err)
+	}
+	return url.EscapedPath()
+}
+
+templ NavLink(href templ.SafeURL, id *eid.EidFactory) {
+	<a class={ "text-warm-800", templ.KV("underline", standardiseURL(string(href)) == getCurrentUrl(ctx)) } href={ href }>
+		{ children... }
+	</a>
+}

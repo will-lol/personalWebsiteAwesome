@@ -1,0 +1,33 @@
+package index
+
+import (
+	"github.com/will-lol/personalWebsiteAwesome/lib/components"
+	"github.com/will-lol/personalWebsiteAwesome/eid"
+	"github.com/will-lol/personalWebsiteAwesome/lib/pointerify"
+)
+
+templ index(id *eid.EidFactory) {
+	@components.Layout("Home", id) {
+		<script type="module" src="assets/js/index/notifications.js"></script>
+		<div class="p-2">
+			@components.FullWidthCarousel(components.NewFullWidthCarouselModel([]components.CarouselPhoto{
+				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/grass.avif"), "My beloved X1 Carbon on the grass outside"),
+				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/walk.avif"), "Me on the South Coast Track in Tasmania"),
+				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/laptop.avif"), "NixOS (screen is a little dim)"),
+				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/server.avif"), "My Dell Optiplex server (I couldn't quite put the side panel on after adding some extra drives)"),
+				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/wallpaper.avif"), "My phone wallpaper, a picture taken from a hill near my house"),
+			}, id))
+		</div>
+		<div class="z-20 relative inset-2">
+			<span class="text-white absolute left-0 top-0 font-serif text-5xl">You can send me notifications</span>
+			<div class="absolute right-0 bottom-0">
+				@components.LoaderButton(templ.Attributes{ "hx-get": "/api/notifications/notify" }, "Sending...", id) {
+					Send me a notification
+				}
+			</div>
+		</div>
+		@components.Button(templ.Attributes{"id": "subscribe"}, id) {
+			click for notifications
+		}
+	}
+}

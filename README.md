@@ -26,7 +26,8 @@ cdk deploy --hotswap
 
 ### Project structure
 - 'routes' are defined in the 'routes' directory
-- 'routes' use services to get data that is passed down into templ 'components'. Each route exports a Handler. If there are sub-routes, they are imported and handled here.
+- 'routes' use services to get data that is passed down into templ 'components'. Each route exports a Handler. 
+- The 'routes' directory is flat. If there are subroutes, they must live in a package next to all of the other routes.
 - 'components' are defined in the 'components' directory
 - Each route has a folder in the 'components' directory
 - The 'components' directory also has a 'util' directory for shared components.

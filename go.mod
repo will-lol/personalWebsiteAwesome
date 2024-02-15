@@ -1,4 +1,4 @@
-module github.com/will-lol/personal_website
+module github.com/will-lol/personalWebsiteAwesome
 
 go 1.20
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfront"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfrontorigins"
@@ -13,7 +14,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
-	"fmt"
 )
 
 type CommandHook struct{}
@@ -58,7 +58,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 		Environment: &map[string]*string{
 			"SUBSCRIPTIONS_TABLE_NAME": subscriptions.TableName(),
 			"METADATA_TABLE_NAME":      metadata.TableName(),
-			"SECRET_ARN":								&secretArn,
+			"SECRET_ARN":               &secretArn,
 		},
 		ParamsAndSecrets: awslambda.ParamsAndSecretsLayerVersion_FromVersion(awslambda.ParamsAndSecretsVersions_V1_0_103, &awslambda.ParamsAndSecretsOptions{}),
 	})

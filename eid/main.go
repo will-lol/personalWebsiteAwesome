@@ -5,15 +5,17 @@ import (
 )
 
 type EidFactory struct {
-	state int
+	state int64
 }
 
-func New() EidFactory {
+func NewEidFactory() EidFactory {
 	return EidFactory{state: 0}
 }
 
-func (e EidFactory) CreateEid() string {
-	eid := strconv.Itoa(e.state)
+func (e EidFactory) GetNext() string {
+	eid := strconv.FormatInt(e.state, 36)
 	e.state += 1
-	return eid 
+
+	return eid
 }
+

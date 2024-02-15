@@ -1,0 +1,106 @@
+package components
+
+import (
+	"fmt"
+	"github.com/will-lol/personalWebsiteAwesome/eid"
+)
+
+type Src struct {
+	Src            string
+	IntrinsicWidth int
+}
+
+type CarouselPhoto struct {
+	Desktop *Src
+	Mobile  *Src
+	Src     *string
+	Alt     string
+}
+
+func NewCarouselPhoto(desktop *Src, mobile *Src, src *string, alt string) CarouselPhoto {
+	return CarouselPhoto{
+		Desktop: desktop,
+		Mobile:  mobile,
+		Src:     src,
+		Alt:     alt,
+	}
+}
+
+script animate(id string) {
+	window.addEventListener("load", () => {
+		const el = document.getElementById(id);
+		let translateWidth = el.scrollWidth / 2;
+		const velocity = 0.050;
+
+		el.animate([
+			{
+				transform: "translateX(0px)",
+			},
+			{
+				transform: `translateX(-${translateWidth}px)`,
+			},
+		], {
+			duration: translateWidth / velocity,
+			iterations: Infinity
+		});
+	})
+}
+
+type FullWidthCarouselModel struct {
+	Photos []CarouselPhoto
+	IDs    []string
+	CarouselID string
+}
+
+func NewFullWidthCarouselModel(photos []CarouselPhoto, id *eid.EidFactory) (m FullWidthCarouselModel) {
+	m.IDs = make([]string, len(photos), len(photos))
+	m.CarouselID = id.GetNext()
+	m.Photos = photos
+
+	for i := range m.IDs {
+		m.IDs[i] = id.GetNext()	
+	}
+
+	return m
+}
+
+templ FullWidthCarousel(m FullWidthCarouselModel) {
+	<div class="overflow-x-hidden relative">
+		<div class="z-10 absolute inset-0 bg-vignette"></div>
+		<div id={ m.CarouselID } class="max-w-none h-[80svh] flex flex-nowrap">
+			@images(m.Photos, m.IDs)
+			@images(m.Photos, m.IDs)
+		</div>
+		@captions(m.Photos, m.IDs)
+		@animate(m.CarouselID)
+	</div>
+}
+
+templ captions(photos []CarouselPhoto, ids []string) {
+}
+
+templ images(photos []CarouselPhoto, ids []string) {
+	for i, photo := range photos {
+		if photo.Src != nil || (photo.Desktop == nil || photo.Mobile == nil) {
+			@noisyImg(templ.Attributes{
+						"alt": templ.EscapeString(photo.Alt),
+						"src": templ.EscapeString(*photo.Src),
+						"id": templ.EscapeString(ids[i]),
+					})
+		} else {
+			@noisyImg(templ.Attributes{
+						"alt": templ.EscapeString(photo.Alt),
+						"id": templ.EscapeString(ids[i]),
+						"srcset": fmt.Sprintf("%s %dw, %s %dw", photo.Mobile.Src, photo.Mobile.IntrinsicWidth, photo.Desktop.Src, photo.Desktop.IntrinsicWidth),
+						"sizes": fmt.Sprintf("(max-width: 640px) %dpx, %dpx", photo.Mobile.IntrinsicWidth, photo.Desktop.IntrinsicWidth),
+					})
+		}
+	}
+}
+
+templ noisyImg(attrs templ.Attributes) {
+	<div class="relative h-full shrink-0 grow-0">
+		<div class="absolute z-10 opacity-10 pointer-events-none bg-repeat inset-0 bg-noise"></div>
+		<img class="h-full" { attrs... }/>
+	</div>
+}
