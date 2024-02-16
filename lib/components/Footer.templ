@@ -1,11 +1,10 @@
 package components
 
-import "github.com/will-lol/personalWebsiteAwesome/eid"
-
-templ Footer(id *eid.EidFactory) {
+templ Footer() {
 	<footer class="bottom-0 absolute">
-		
-		
+		@Button(templ.Attributes{"id": "subscribe"}) {
+			click for notifications
+		}
 	</footer>
 }
 

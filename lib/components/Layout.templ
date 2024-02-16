@@ -1,8 +1,7 @@
 package components
 
-import "github.com/will-lol/personalWebsiteAwesome/eid"
 
-templ Layout(title string, id *eid.EidFactory) {
+templ Layout(title string) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -26,9 +25,9 @@ templ Layout(title string, id *eid.EidFactory) {
 		</head>
 		<body hx-ext="loading-states" class="relative bg-warm-100 h-[200vh] text-warm-900">
 			<div id="errors"></div>
-			@Nav(id)
+			@Nav()
 			{ children... }
-			@Footer(id)
+			@Footer()
 		</body>
 	</html>
 }

@@ -1,13 +1,11 @@
 package components
 
-import "github.com/will-lol/personalWebsiteAwesome/eid"
-
 import (
 	"github.com/will-lol/personalWebsiteAwesome/lib/merge"
 )
 
-templ LoaderButton(attrs templ.Attributes, loadingText string, id *eid.EidFactory) {
-	@Button(merge.MergeAttrs(attrs, templ.Attributes{ "hx-disabled-elt": "this", "hx-swap": "none", "hx-on::after-request": "this.classList.remove('htmx-request')"}), id) {
+templ LoaderButton(attrs templ.Attributes, loadingText string) {
+	@Button(merge.MergeAttrs(attrs, templ.Attributes{ "hx-disabled-elt": "this", "hx-swap": "none", "hx-on::after-request": "this.classList.remove('htmx-request')"})) {
 		<div id="buttonText">
 			{ children... }
 		</div>

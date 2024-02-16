@@ -2,7 +2,8 @@ package components
 
 import (
 	"fmt"
-	"github.com/will-lol/personalWebsiteAwesome/eid"
+	"github.com/will-lol/personalWebsiteAwesome/services/eid"
+	"log/slog"
 )
 
 type Src struct {
@@ -47,36 +48,117 @@ script animate(id string) {
 }
 
 type FullWidthCarouselModel struct {
-	Photos []CarouselPhoto
-	IDs    []string
+	Photos     []CarouselPhoto
+	IDs        []string
 	CarouselID string
+	RootID     string
 }
 
-func NewFullWidthCarouselModel(photos []CarouselPhoto, id *eid.EidFactory) (m FullWidthCarouselModel) {
+func NewFullWidthCarouselModel(photos []CarouselPhoto, ctx context.Context) (m FullWidthCarouselModel) {
 	m.IDs = make([]string, len(photos), len(photos))
-	m.CarouselID = id.GetNext()
+	m.CarouselID = eid.GetNextHandled(ctx, slog.Default())
+	m.RootID = eid.GetNextHandled(ctx, slog.Default())
 	m.Photos = photos
 
 	for i := range m.IDs {
-		m.IDs[i] = id.GetNext()	
+		m.IDs[i] = eid.GetNextHandled(ctx, slog.Default())
 	}
 
 	return m
 }
 
 templ FullWidthCarousel(m FullWidthCarouselModel) {
-	<div class="overflow-x-hidden relative">
+	<div id={ m.RootID } class="overflow-hidden relative">
 		<div class="z-10 absolute inset-0 bg-vignette"></div>
 		<div id={ m.CarouselID } class="max-w-none h-[80svh] flex flex-nowrap">
 			@images(m.Photos, m.IDs)
 			@images(m.Photos, m.IDs)
 		</div>
-		@captions(m.Photos, m.IDs)
 		@animate(m.CarouselID)
+		@captions(m.Photos, m.IDs, m.RootID)
 	</div>
 }
 
-templ captions(photos []CarouselPhoto, ids []string) {
+templ captions(photos []CarouselPhoto, ids []string, rootId string) {
+	<div class="absolute bottom-0 font-semibold px-3 py-2 grid grid-rows-1 grid-cols-1 text-white z-20">
+		for i, caption := range photos {
+			<div class="first:h-full first:opacity-100 h-0 opacity-0" id={ ids[i] + "_caption" }>
+				{ caption.Alt }
+			</div>
+		}
+		@animateCaptions(ids, rootId)
+	</div>
+}
+
+script animateCaptions(ids []string, rootId string) {
+	window.addEventListener("load", () => {
+		const images = [];
+		const captions = [];
+
+		for (const id of ids) {
+			images.push(document.querySelectorAll(`[id="${id}"]`));
+			captions.push(document.getElementById(`${id}_caption`));
+		}
+		
+		const captionParent = captions[0].parentElement;
+		function prioritise(caption) {
+			const current = captionParent.firstElementChild;
+			const currentFirst = current.getBoundingClientRect();
+
+			if (current.id == caption.id) {
+				return;
+			}
+			
+			captionParent.prepend(caption);
+			const currentLast = current.getBoundingClientRect();
+			const deltaX = currentFirst.left - currentLast.left;
+			const deltaY = currentFirst.top - currentLast.top;
+
+			current.animate([{
+				transformOrigin: 'top left',
+				transform: `translate(${deltaX}px, ${deltaY}px)`,
+				opacity: 1,
+			}, {
+				opacity: 0,
+			}, {
+				transformOrigin: 'top left',
+				transform: `translate(${deltaX}px, ${deltaY-40}px)`,
+			}], {
+				duration: 1000,
+				easing: 'ease-in-out',
+			})
+
+			caption.animate([{
+				transform: `translateY(40px)`,
+				opacity: 0,
+			}, {
+				transform: `translateY(0px)`,
+				opacity: 1,
+			}], {
+				duration: 1000,
+				easing: 'ease-in-out',
+			})
+
+			const nextLast = caption.getBoundingClientRect();
+		}
+
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) {
+					prioritise(document.getElementById(entry.target.id + "_caption"))
+				}
+			})
+		}, {
+			root: document.getElementById(rootId),
+			rootMargin: "0% -40% 0% -40%"
+		})
+
+		for (const image of images) {
+			image.forEach((el) => {
+				observer.observe(el);
+			})
+		}
+	})
 }
 
 templ images(photos []CarouselPhoto, ids []string) {

@@ -13,6 +13,13 @@ module.exports = {
       "md": "768px",
     },
     extend: {
+      typography: ({ theme }) => ({
+        warm: {
+          css: {
+            '--tw-prose-body': theme('colors.warm[900]')
+          }
+        }
+      }),
       colors: {
         warm: {
           100: "oklch(98.23% 0.0152 67.74)",
@@ -28,7 +35,7 @@ module.exports = {
       },
       backgroundImage: ({ theme }) => ({
         "noise": "url(\"/assets/images/noise.png\")",
-        "vignette": "radial-gradient(transparent, rgba(0,0,0,0.3))"
+        "vignette": "radial-gradient(transparent, rgba(0,0,0,0.5))"
       }),
     },
     fontFamily: {
@@ -37,7 +44,7 @@ module.exports = {
     },
   },
   plugins: [
-
+    require('@tailwindcss/typography'),
   ],
   corePlugins: {
     preflight: true
