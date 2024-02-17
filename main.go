@@ -9,27 +9,52 @@ import (
 
 	"github.com/akrylysov/algnhsa"
 	"github.com/go-chi/chi/v5"
-	"github.com/will-lol/personalWebsiteAwesome/db"
-	"github.com/will-lol/personalWebsiteAwesome/routes"
-	"github.com/will-lol/personalWebsiteAwesome/services/notifications"
-	"github.com/will-lol/personalWebsiteAwesome/middlewares/urlCtx"
-	"github.com/will-lol/personalWebsiteAwesome/middlewares/envCtx"
+	"github.com/will-lol/personalWebsiteAwesome/dependencies/db"
+	"github.com/will-lol/personalWebsiteAwesome/dependencies/fs"
+	"github.com/will-lol/personalWebsiteAwesome/dependencies/s3"
 	"github.com/will-lol/personalWebsiteAwesome/middlewares/eidCtx"
+	"github.com/will-lol/personalWebsiteAwesome/middlewares/envCtx"
+	"github.com/will-lol/personalWebsiteAwesome/middlewares/urlCtx"
+	"github.com/will-lol/personalWebsiteAwesome/routes"
+	"github.com/will-lol/personalWebsiteAwesome/services/blog"
 	"github.com/will-lol/personalWebsiteAwesome/services/env"
+	"github.com/will-lol/personalWebsiteAwesome/services/notifications"
 )
 
 func main() {
 	router := chi.NewRouter()
 	router.Use(urlCtx.Middleware, envCtx.Middleware, eidCtx.Middleware)
 
-	l := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	l := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+		Level: slog.LevelDebug,
+	}))
 	slog.SetDefault(l)
-	d, err := db.NewDB[notifications.Subscription]()
-	if (err != nil) {
-		l.Warn("DB init failed")
+
+	var d *db.DB[notifications.Subscription]
+	if env.GetEnv(nil) != "dev" {
+		var err error
+		d, err = db.NewDB[notifications.Subscription]()
+		if err != nil {
+			l.Error("DB init failed")
+		}
 	}
 
-	r := routes.NewRoutesHandler(l, d)
+	var f blog.Files
+	if env.GetEnv(nil) == "dev" {
+		f = fs.NewFs("blog")
+	} else {
+		var err error
+		f, err = s3.NewS3()
+		if err != nil {
+			l.Error("S3 init failed")
+		}
+	}
+
+	r, err := routes.NewRoutesHandler(l, d, &f)
+	if err != nil {
+		l.Error(err.Error())
+	}
 	r.Router(router)
 
 	if env.GetEnv(nil) == "dev" {

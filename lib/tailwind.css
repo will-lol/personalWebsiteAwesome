@@ -4,32 +4,28 @@
 
 @layer base {
 	@font-face {
-		src: url('../fonts/cormorant.woff2');
+		src: url('../fonts/cormorant.woff2') format("woff2");
 		font-family: "Cormorant";
 		font-style: normal;
 		font-weight: 300 700;
-		font-display: swap;
 	}
 	@font-face {
-		src: url('../fonts/cormorant-italics.woff2');
+		src: url('../fonts/cormorant-italics.woff2') format("woff2");
 		font-family: "Cormorant";
 		font-style: italic;
 		font-weight: 300 700;
-		font-display: swap;
 	}
 	@font-face {
-		src: url('../fonts/ysabeau.woff2');
+		src: url('../fonts/ysabeau.woff2') format("woff2");
+		font-family: "Ysabeau";
+		font-style: normal;
+		font-weight: 1 1000;
+	}
+	@font-face {
+		src: url('../fonts/ysabeau-italics.woff2') format("woff2");
 		font-family: "Ysabeau";
 		font-style: italic;
 		font-weight: 1 1000;
-		font-display: swap;
-	}
-	@font-face {
-		src: url('../fonts/ysabeau-italics.woff2');
-		font-family: "Cormorant";
-		font-style: italic;
-		font-weight: 1 1000;
-		font-display: swap;
 	}
 	.htmx-request #buttonText {
 		@apply hidden;

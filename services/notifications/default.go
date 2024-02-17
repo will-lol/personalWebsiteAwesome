@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	webpush "github.com/SherClockHolmes/webpush-go"
-	"github.com/will-lol/personalWebsiteAwesome/db"
 	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
+
+	webpush "github.com/SherClockHolmes/webpush-go"
+	"github.com/will-lol/personalWebsiteAwesome/dependencies/db"
 )
 
 type Subscription = webpush.Subscription
@@ -24,25 +25,18 @@ type notificationsService interface {
 type NotificationsService struct {
 	Log       *slog.Logger
 	db        *db.DB[Subscription]
-	VapidPub  string
-	vapidPriv string
+	vapidPub  *string
+	vapidPriv *string
 }
 
 func NewNotificationsService(l *slog.Logger, d *db.DB[Subscription]) (*NotificationsService, error) {
-	pub, priv, err := getSecrets()
-	if err != nil {
-		return nil, err
-	}
-
 	return &NotificationsService{
 		Log:       l,
 		db:        d,
-		VapidPub:  *pub,
-		vapidPriv: *priv,
 	}, nil
 }
 
-func getSecrets() (publicKey *string, privateKey *string, err error) {
+func (n NotificationsService) getSecrets() (publicKey *string, privateKey *string, err error) {
 	// Get required environment variables
 	// The port of the parameters and secrets extension is needed because it may change
 	port, err := strconv.Atoi(os.Getenv("PARAMETERS_SECRETS_EXTENSION_HTTP_PORT"))
@@ -79,7 +73,7 @@ func getSecrets() (publicKey *string, privateKey *string, err error) {
 		return nil, nil, err
 	}
 
-	//The response is a JSON object that needs unmarshalling
+	// The response is a JSON object that needs unmarshalling
 	var rawUnmarshalling map[string]interface{}
 	err = json.Unmarshal(bytes, &rawUnmarshalling)
 	if err != nil {
@@ -97,6 +91,28 @@ func getSecrets() (publicKey *string, privateKey *string, err error) {
 	return &secrets.PublicKey, &secrets.PrivateKey, nil
 }
 
+func (n NotificationsService) GetPubKey() (key *string, err error) {
+	if n.vapidPub != nil {
+		return n.vapidPub, nil
+	}
+	n.vapidPub, n.vapidPriv, err = n.getSecrets()
+	if err != nil {
+		return nil, err 
+	}
+	return n.vapidPub, nil
+}
+
+func (n NotificationsService) GetPrivKey() (key *string, err error) {
+	if n.vapidPriv != nil {
+		return n.vapidPriv, nil
+	}
+	n.vapidPub, n.vapidPriv, err = n.getSecrets()
+	if err != nil {
+		return nil, err 
+	}
+	return n.vapidPriv, nil
+}
+
 func (n NotificationsService) Notify() (err error) {
 	subscribers, err := n.db.GetObjects()
 	if err != nil {
@@ -112,14 +128,18 @@ func (n NotificationsService) Notify() (err error) {
 }
 
 func (n NotificationsService) notifySubscriber(sub Subscription) error {
+	pub, err := n.GetPubKey()
+	priv, err := n.GetPrivKey()
+	if err != nil {
+		return err
+	}
 	resp, err := webpush.SendNotification([]byte("Notification received"), &sub, &webpush.Options{
-		VAPIDPublicKey:  n.VapidPub,
-		VAPIDPrivateKey: n.vapidPriv,
+		VAPIDPublicKey:  *pub,
+		VAPIDPrivateKey: *priv,
 		TTL:             64,
 		Subscriber:      "will.bradshaw50@gmail.com",
 	})
 	if err != nil {
-		n.Log.Error(err.Error())
 		return err
 	}
 	if resp.StatusCode == 410 {

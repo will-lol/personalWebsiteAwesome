@@ -1,11 +1,22 @@
 package components
 
 templ Footer() {
-	<footer class="bottom-0 absolute">
-		@Button(templ.Attributes{"id": "subscribe"}) {
-			click for notifications
-		}
+	<footer class="flex text-warm-700 flex-col gap-2 py-2 items-center border-solid border-t border-warm-300">
+		<div class="flex gap-2">
+			@A(templ.Attributes{"href": "/"}) {
+				Home
+			}
+			@A(templ.Attributes{"href": "/blog"}) {
+				Blog
+			}
+			@A(templ.Attributes{"href": "/contact"}) {
+				Contact
+			}
+			@A(templ.Attributes{"id": "subscribe"}) {
+				Secret link
+			}
+		</div>
+		<span>Site built by William Bradshaw</span>
 	</footer>
 }
-
 

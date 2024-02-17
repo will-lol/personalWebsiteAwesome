@@ -2,14 +2,14 @@ package components
 
 import (
 	"net/url"
-	"log"
 	urlService "github.com/will-lol/personalWebsiteAwesome/services/url"
+	"log/slog"
 )
 
 func standardiseURL(urlString string) string {
 	url, err := url.Parse(urlString)
 	if err != nil {
-		log.Fatal(err)
+		slog.Default().Error(err.Error())
 	}
 	return url.String()
 }
@@ -17,7 +17,7 @@ func standardiseURL(urlString string) string {
 func getCurrentUrl(ctx context.Context) string {
 	url, err := urlService.GetURL(ctx)
 	if err != nil { 
-		log.Fatal(err)
+		slog.Default().Error(err.Error())
 	}
 	return url.EscapedPath()
 }

@@ -14,10 +14,10 @@ import (
 
 type NotificationsHandler struct {
 	Log                  *slog.Logger
-	NotificationsService notifications.NotificationsService
+	NotificationsService *notifications.NotificationsService
 }
 
-func NewNotificationsHandler(l *slog.Logger, n notifications.NotificationsService) NotificationsHandler {
+func NewNotificationsHandler(l *slog.Logger, n *notifications.NotificationsService) NotificationsHandler {
 	return NotificationsHandler{
 		Log:                  l,
 		NotificationsService: n,
@@ -54,5 +54,10 @@ func (n NotificationsHandler) notifyHandler(w http.ResponseWriter, r *http.Reque
 
 func (n NotificationsHandler) publicKeyHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
-	w.Write([]byte(n.NotificationsService.VapidPub))
+	pub, err := n.NotificationsService.GetPubKey()
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+	}
+	w.Write([]byte(*pub))
 }

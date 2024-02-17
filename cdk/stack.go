@@ -19,7 +19,7 @@ import (
 type CommandHook struct{}
 
 func (t CommandHook) BeforeBundling(inputDir *string, outputDir *string) *[]*string {
-	command1 := "./prebuild.sh"
+	command1 := "./prebuild.sh\nwait"
 	return &[]*string{&command1}
 }
 func (t CommandHook) AfterBundling(inputDir *string, outputDir *string) *[]*string {
@@ -49,6 +49,14 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 	secretArn := "arn:aws:secretsmanager:ap-southeast-2:301436506805:secret:website/vapid-keys-WIfxAO"
 	a := awssecretsmanager.Secret_FromSecretCompleteArn(stack, jsii.String("SecretFromCompleteArn"), jsii.String(secretArn))
 
+	blogBucket := awss3.NewBucket(stack, jsii.String("blog"), &awss3.BucketProps{
+		BlockPublicAccess: awss3.BlockPublicAccess_BLOCK_ALL(),
+		Encryption:        awss3.BucketEncryption_S3_MANAGED,
+		EnforceSSL:        jsii.Bool(true),
+		RemovalPolicy:     awscdk.RemovalPolicy_DESTROY,
+		Versioned:         jsii.Bool(false),
+	})
+
 	f := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("handler"), &awscdklambdagoalpha.GoFunctionProps{
 		Entry: jsii.String("../"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
@@ -58,9 +66,11 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 		Environment: &map[string]*string{
 			"SUBSCRIPTIONS_TABLE_NAME": subscriptions.TableName(),
 			"METADATA_TABLE_NAME":      metadata.TableName(),
+			"BLOG_BUCKET_NAME":         blogBucket.BucketName(),
 			"SECRET_ARN":               &secretArn,
 		},
-		ParamsAndSecrets: awslambda.ParamsAndSecretsLayerVersion_FromVersion(awslambda.ParamsAndSecretsVersions_V1_0_103, &awslambda.ParamsAndSecretsOptions{}),
+		ParamsAndSecrets: awslambda.ParamsAndSecretsLayerVersion_FromVersion(awslambda.ParamsAndSecretsVersions_V1_0_103, &awslambda.ParamsAndSecretsOptions{
+		}),
 	})
 
 	a.GrantRead(f, nil)
@@ -76,6 +86,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 
 	metadata.GrantFullAccess(f)
 	subscriptions.GrantFullAccess(f)
+	blogBucket.GrantRead(f, nil)
 
 	assetsBucket := awss3.NewBucket(stack, jsii.String("assets"), &awss3.BucketProps{
 		BlockPublicAccess: awss3.BlockPublicAccess_BLOCK_ALL(),
@@ -134,6 +145,13 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 		DestinationKeyPrefix: jsii.String("assets"),
 		Distribution:         cf,
 		DistributionPaths:    jsii.Strings("/assets*"),
+	})
+
+	awss3deployment.NewBucketDeployment(stack, jsii.String("blogDeployment"), &awss3deployment.BucketDeploymentProps{
+		DestinationBucket: blogBucket,
+		Sources: &[]awss3deployment.ISource{
+			awss3deployment.Source_Asset(jsii.String("../blog"), nil),
+		},
 	})
 
 	return stack

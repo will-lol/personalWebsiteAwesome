@@ -1,0 +1,11 @@
+package components
+
+import (
+	"github.com/will-lol/personalWebsiteAwesome/lib/merge"
+)
+
+templ A(attrs templ.Attributes) {
+	<a { merge.MergeAttrs(attrs, templ.Attributes{ "class": "underline cursor-pointer" })... }>
+		{ children... }
+	</a>
+}

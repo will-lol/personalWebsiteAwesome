@@ -33,7 +33,7 @@ script animate(id string) {
 		let translateWidth = el.scrollWidth / 2;
 		const velocity = 0.050;
 
-		el.animate([
+		const anim = el.animate([
 			{
 				transform: "translateX(0px)",
 			},
@@ -42,8 +42,17 @@ script animate(id string) {
 			},
 		], {
 			duration: translateWidth / velocity,
-			iterations: Infinity
+			iterations: Infinity,
+			fill: "both"
 		});
+
+		// Only in Firefox does IntersectionObserver work in the expected way with animating transforms. On other browsers the transform must be committed (or there be a user interaction) for the intersection to be observed. To circumvent this we just commit the transform every 500ms by pausing and playing the animation. Super janky but it works.
+		if (navigator.userAgent.search("Firefox") < 0) {
+			setInterval(() => {
+				anim.pause();
+				anim.play();
+			}, 500)
+		}
 	})
 }
 
@@ -128,7 +137,7 @@ script animateCaptions(ids []string, rootId string) {
 				easing: 'ease-in-out',
 			})
 
-			caption.animate([{
+			currentAnim = caption.animate([{
 				transform: `translateY(40px)`,
 				opacity: 0,
 			}, {
@@ -138,19 +147,18 @@ script animateCaptions(ids []string, rootId string) {
 				duration: 1000,
 				easing: 'ease-in-out',
 			})
-
-			const nextLast = caption.getBoundingClientRect();
 		}
 
 		const observer = new IntersectionObserver((entries) => {
 			entries.forEach((entry) => {
-				if (entry.isIntersecting) {
-					prioritise(document.getElementById(entry.target.id + "_caption"))
+				if (entry.isIntersecting && entry.intersectionRatio < 0.5) {
+					prioritise(document.getElementById(entry.target.id + "_caption"));
 				}
 			})
 		}, {
 			root: document.getElementById(rootId),
-			rootMargin: "0% -40% 0% -40%"
+			rootMargin: "0% -40% 0% 0%",
+			threshold: 0,
 		})
 
 		for (const image of images) {
