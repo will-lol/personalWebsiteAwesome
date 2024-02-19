@@ -2,9 +2,9 @@ package components
 
 templ Nav() {
 	<nav class="bg-warm-100 border-b border-warm-300 border-solid top-0 flex flex-row w-full justify-between items-center py-1 px-2 gap-2">
-		<div class="font-serif whitespace-nowrap text-2xl font-bold">
+		<a href="/" class="font-serif cursor-pointer whitespace-nowrap text-2xl font-bold">
 			W. Bradshaw	
-		</div>
+		</a>
 		<div class="flex flex-row gap-2">
 			@NavLink(templ.URL("/")) { Home }
 			@NavLink(templ.URL("/blog")) { Blog }

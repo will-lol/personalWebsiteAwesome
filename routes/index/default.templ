@@ -4,7 +4,7 @@ import (
 	"github.com/will-lol/personalWebsiteAwesome/lib/components"
 	"github.com/will-lol/personalWebsiteAwesome/lib/pointerify"
 	"time"
-	
+
 	"strconv"
 )
 
@@ -20,21 +20,23 @@ templ index() {
 				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/wallpaper.avif"), "My phone wallpaper, a picture taken from a hill near my house"),
 			}, ctx))
 		</div>
-		@components.Article() {
-			<p>
-				Hello, I'm Will. I'm a software developer and I built this website that can send me push notifications. Go ahead, try it: 
-				@components.LoaderButton(templ.Attributes{ "hx-get": "/api/notifications/notify" }, "Sending...") {
-					Send me a notification
-				}
-			</p>
-			<p>
-				I'm { strconv.Itoa(int(getAge().Hours() / 8766)) } and eager to learn about software. Computers have always interested me. Using them to do precisely what I want is why I keep building things with them. Some of what I've done is listed below.
-			</p>
+		@components.Main() {
+			@components.Prose() {
+				<p>
+					Hello, I'm Will. I'm a software developer and I built this website that can send me push notifications. Go ahead, try it: 
+					@components.LoaderButton(templ.Attributes{ "hx-get": "/api/notifications/notify" }, "Sending...") {
+						Send me a notification
+					}
+				</p>
+				<p>
+					I'm { strconv.Itoa(int(getAge().Hours() / 8766)) } and eager to learn about software. Computers have always interested me. Using them to do precisely what I want is why I keep building things with them. Some of what I've done is listed below.
+				</p>
+			}
 		}
 	}
 }
 
-func getAge() time.Duration { 
+func getAge() time.Duration {
 	loc, _ := time.LoadLocation("Australia/Hobart")
 	return time.Now().In(loc).Sub(time.Date(2005, 11, 24, 0, 0, 0, 0, loc))
 }

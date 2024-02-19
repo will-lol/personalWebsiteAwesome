@@ -1,0 +1,40 @@
+package blog
+
+import (
+	blogService "github.com/will-lol/personalWebsiteAwesome/services/blog"
+	"github.com/will-lol/personalWebsiteAwesome/lib/components"
+	"github.com/will-lol/personalWebsiteAwesome/lib/merge"
+	"time"
+	"github.com/will-lol/personalWebsiteAwesome/services/eid"
+	"log/slog"
+)
+
+templ postPage(blogPost *blogService.Post) {
+	@components.Layout(blogPost.Frontmatter.Title) {
+		@components.Main() {
+			@components.Header() {
+				{ blogPost.Frontmatter.Title }
+				<div>
+					@date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "text-base font-sans" })
+				</div>
+			}
+			@components.Prose() {
+				@templ.Raw(blogPost.Content)
+			}
+		}
+	}
+}
+
+templ date(date time.Time, id string, attrs templ.Attributes) {
+	<span { merge.MergeAttrs(attrs, templ.Attributes{ "id": id })... }>
+		@dateFiller(id, date)
+	</span>
+}
+
+script dateFiller(id string, date time.Time) {
+	document.getElementById(id).innerText = (new Date(date)).toLocaleDateString(undefined, {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+}

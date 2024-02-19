@@ -2,10 +2,31 @@ package blog
 
 import (
 	"github.com/will-lol/personalWebsiteAwesome/lib/components"
+	b "github.com/will-lol/personalWebsiteAwesome/services/blog"
+	"time"
+	"github.com/will-lol/personalWebsiteAwesome/lib/pointerify"
 )
 
-templ blog() {
+templ blog(blog b.Blog) {
 	@components.Layout("Blog") {
-
+		@components.Main() {
+			@components.Header() {
+				Blog
+			}
+			for _, item := range pointerify.DePointer(blog.GetAllPosts()) {
+				@postPreview(item)
+			}
+		}
 	}
+}
+
+templ postPreview(post *b.Post) {
+	<div>
+		{ post.Frontmatter.Title }
+		{ post.Frontmatter.Description }
+		{ post.Frontmatter.Date.Format(time.RFC1123) }
+		<div>
+			@templ.Raw(post.Content)
+		</div>
+	</div>
 }
