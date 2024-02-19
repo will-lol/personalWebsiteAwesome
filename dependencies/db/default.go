@@ -12,17 +12,24 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-type DB[T any] struct {
+type db[T any] struct {
 	DynamoDbClient *dynamodb.Client
 	TableName      string
 }
 
-func NewDB[T any]() (c *DB[T], err error) {
+type DB[T any] interface {
+	DeleteObject(T) error
+	DoesObjExist(T) (*bool, error)
+	GetObjects() (*[]T, error)
+	SaveObject(T) (error)
+}
+
+func NewDB[T any]() (c *db[T], err error) {
 	tableName, err := getTableName()
 	if err != nil {
 		return c, err
 	}
-	c = &DB[T]{
+	c = &db[T]{
 		TableName: tableName,
 	}
 	config, err := config.LoadDefaultConfig(context.TODO())
@@ -42,7 +49,7 @@ func getTableName() (name string, err error) {
 }
 
 // DoesObjExist returns whether an object found in the DB according to the given searchObj or an error. The searchObj is the desired object in the DB. It does not need to be complete, but should include the primary key in the database.
-func (c DB[T]) DoesObjExist(searchObj T) (*bool, error) {
+func (c db[T]) DoesObjExist(searchObj T) (*bool, error) {
 	attributeValueObj, err := attributevalue.MarshalMap(searchObj)
 	if err != nil {
 		return nil, err
@@ -60,7 +67,7 @@ func (c DB[T]) DoesObjExist(searchObj T) (*bool, error) {
 	return &exists, nil
 }
 
-func (c DB[T]) SaveObject(obj T) (err error) {
+func (c db[T]) SaveObject(obj T) (err error) {
 	objAttributevalue, err := attributevalue.MarshalMap(obj)
 	if err != nil {
 		return err
@@ -73,7 +80,7 @@ func (c DB[T]) SaveObject(obj T) (err error) {
 	return err
 }
 
-func (c DB[T]) DeleteObject(obj T) (err error) {
+func (c db[T]) DeleteObject(obj T) (err error) {
 	objAttributevalue, err := attributevalue.MarshalMap(obj)
 	if err != nil {
 		return err
@@ -86,7 +93,7 @@ func (c DB[T]) DeleteObject(obj T) (err error) {
 	return err
 }
 
-func (c DB[T]) GetObjects() (*[]T, error) {
+func (c db[T]) GetObjects() (*[]T, error) {
 	metadata, err := c.DynamoDbClient.DescribeTable(context.TODO(), &dynamodb.DescribeTableInput{
 		TableName: aws.String(c.TableName),
 	})

@@ -17,26 +17,28 @@ import (
 
 type Subscription = webpush.Subscription
 
-type notificationsService interface {
+type NotificationsService interface {
 	Notify() (err error)
 	Subscribe(sub Subscription) (err error)
+	GetPubKey() (*string, error)
+	GetPrivKey() (*string, error)
 }
 
-type NotificationsService struct {
+type notificationsService struct {
 	Log       *slog.Logger
-	db        *db.DB[Subscription]
+	db        db.DB[Subscription]
 	vapidPub  *string
 	vapidPriv *string
 }
 
-func NewNotificationsService(l *slog.Logger, d *db.DB[Subscription]) (*NotificationsService, error) {
-	return &NotificationsService{
+func NewNotificationsService(l *slog.Logger, d db.DB[Subscription]) (*notificationsService, error) {
+	return &notificationsService{
 		Log:       l,
 		db:        d,
 	}, nil
 }
 
-func (n NotificationsService) getSecrets() (publicKey *string, privateKey *string, err error) {
+func (n notificationsService) getSecrets() (publicKey *string, privateKey *string, err error) {
 	// Get required environment variables
 	// The port of the parameters and secrets extension is needed because it may change
 	port, err := strconv.Atoi(os.Getenv("PARAMETERS_SECRETS_EXTENSION_HTTP_PORT"))
@@ -91,7 +93,7 @@ func (n NotificationsService) getSecrets() (publicKey *string, privateKey *strin
 	return &secrets.PublicKey, &secrets.PrivateKey, nil
 }
 
-func (n NotificationsService) GetPubKey() (key *string, err error) {
+func (n notificationsService) GetPubKey() (key *string, err error) {
 	if n.vapidPub != nil {
 		return n.vapidPub, nil
 	}
@@ -102,7 +104,7 @@ func (n NotificationsService) GetPubKey() (key *string, err error) {
 	return n.vapidPub, nil
 }
 
-func (n NotificationsService) GetPrivKey() (key *string, err error) {
+func (n notificationsService) GetPrivKey() (key *string, err error) {
 	if n.vapidPriv != nil {
 		return n.vapidPriv, nil
 	}
@@ -113,7 +115,7 @@ func (n NotificationsService) GetPrivKey() (key *string, err error) {
 	return n.vapidPriv, nil
 }
 
-func (n NotificationsService) Notify() (err error) {
+func (n notificationsService) Notify() (err error) {
 	subscribers, err := n.db.GetObjects()
 	if err != nil {
 		n.Log.Error(err.Error())
@@ -127,7 +129,7 @@ func (n NotificationsService) Notify() (err error) {
 	return
 }
 
-func (n NotificationsService) notifySubscriber(sub Subscription) error {
+func (n notificationsService) notifySubscriber(sub Subscription) error {
 	pub, err := n.GetPubKey()
 	priv, err := n.GetPrivKey()
 	if err != nil {
@@ -148,7 +150,7 @@ func (n NotificationsService) notifySubscriber(sub Subscription) error {
 	return nil
 }
 
-func (n NotificationsService) Subscribe(sub Subscription) error {
+func (n notificationsService) Subscribe(sub Subscription) error {
 	_, err := url.ParseRequestURI(sub.Endpoint)
 	if len(sub.Endpoint) < 1 || err != nil {
 		n.Log.Error("Improper URL")

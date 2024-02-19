@@ -6,17 +6,17 @@ import (
 	"github.com/will-lol/personalWebsiteAwesome/services/blog"
 )
 
-type Fs struct {
+type fs struct {
 	folderName string
 }
 
-func NewFs(folder string) *Fs {
-	return &Fs{
+func NewFs(folder string) *fs {
+	return &fs{
 		folderName: folder,
 	}
 }
 
-func (f Fs) GetAllFiles() (*[]*blog.SimpleFile, error) {
+func (f fs) GetAllFiles() (*[]*blog.SimpleFile, error) {
 	files, err := os.ReadDir(f.folderName)
 	if err != nil {
 		return nil, err

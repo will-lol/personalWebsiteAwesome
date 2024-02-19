@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/will-lol/personalWebsiteAwesome/dependencies/db"
+	"github.com/will-lol/personalWebsiteAwesome/lib/pointerify"
 	"github.com/will-lol/personalWebsiteAwesome/routes/api"
 	"github.com/will-lol/personalWebsiteAwesome/routes/blog"
 	"github.com/will-lol/personalWebsiteAwesome/routes/index"
@@ -15,13 +16,17 @@ import (
 
 type RoutesHandler struct {
 	Log         *slog.Logger
-	DB          *db.DB[notifications.Subscription]
+	DB          db.DB[notifications.Subscription]
 	Files       *blogService.Files
-	blogHandler *blog.BlogHandler
-	apiHandler  *api.ApiHandler
+	blogHandler RouteHandler
+	apiHandler  RouteHandler
 }
 
-func NewRoutesHandler(l *slog.Logger, d *db.DB[notifications.Subscription], f *blogService.Files) (*RoutesHandler, error) {
+type RouteHandler interface {
+	Router(chi.Router)
+}
+
+func NewRoutesHandler(l *slog.Logger, d db.DB[notifications.Subscription], f *blogService.Files) (*RoutesHandler, error) {
 	bHandler, err := blog.NewBlogHandler(f, l)
 	if err != nil {
 		return nil, err
@@ -31,8 +36,8 @@ func NewRoutesHandler(l *slog.Logger, d *db.DB[notifications.Subscription], f *b
 		Log:   l,
 		DB:    d,
 		Files: f,
-		blogHandler: bHandler,
-		apiHandler: api.NewApiHandler(l, d),
+		blogHandler: *bHandler,
+		apiHandler: pointerify.DePointer(api.NewApiHandler(l, d)),
 	}, nil
 }
 

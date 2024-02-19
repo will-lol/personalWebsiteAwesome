@@ -4,27 +4,26 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log/slog"
 	"os"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	awsS3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/will-lol/personalWebsiteAwesome/services/blog"
 )
 
-type S3 struct {
+type s3 struct {
 	bucketName *string
-	client     *s3.Client
+	client     *awsS3.Client
 }
 
-func NewS3() (s *S3, err error) {
+func NewS3() (s *s3, err error) {
 	bucketName, err := getBucketName()
 	if err != nil {
 		return nil, err
 	}
 
-	s = &S3{
+	s = &s3{
 		bucketName: &bucketName,
 	}
 
@@ -33,7 +32,7 @@ func NewS3() (s *S3, err error) {
 		return nil, err
 	}
 
-	s.client = s3.NewFromConfig(awsConfig)
+	s.client = awsS3.NewFromConfig(awsConfig)
 
 	return s, nil
 }
@@ -46,12 +45,10 @@ func getBucketName() (name string, err error) {
 	return name, err
 }
 
-func (s S3) GetAllFiles() (*[]*blog.SimpleFile, error) {
-	slog.Default().Debug("get awwwl the files")
-	res, err := s.client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
+func (s s3) GetAllFiles() (*[]*blog.SimpleFile, error) {
+	res, err := s.client.ListObjectsV2(context.TODO(), &awsS3.ListObjectsV2Input{
 		Bucket: s.bucketName,
 	})
-	slog.Default().Debug(*res.Contents[0].Key)
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +74,6 @@ func (s S3) GetAllFiles() (*[]*blog.SimpleFile, error) {
 				Name: *key,
 			}
 			objCh <- obj
-
-			slog.Default().Debug(string(bytes))
 		}(object.Key, errCh, objCh)
 	}
 
@@ -94,7 +89,6 @@ func (s S3) GetAllFiles() (*[]*blog.SimpleFile, error) {
 
 	p := make([]*blog.SimpleFile, 0, len(res.Contents))
 	for obj := range objCh {
-		slog.Default().Debug(string(obj.Bytes))
 		p = append(p, obj)
 	}
 
@@ -103,9 +97,8 @@ func (s S3) GetAllFiles() (*[]*blog.SimpleFile, error) {
 	return &p, nil
 }
 
-func (s S3) getObject(key *string) ([]byte, error) {
-	slog.Default().Debug("welcome to getObject")
-	res, err := s.client.GetObject(context.TODO(), &s3.GetObjectInput{
+func (s s3) getObject(key *string) ([]byte, error) {
+	res, err := s.client.GetObject(context.TODO(), &awsS3.GetObjectInput{
 		Bucket: s.bucketName,
 		Key:    key,
 	})
