@@ -31,7 +31,7 @@ func main() {
 	}))
 	slog.SetDefault(l)
 
-	var d *db.DB[notifications.Subscription]
+	var d db.DB[notifications.Subscription]
 	if env.GetEnv(nil) != "dev" {
 		var err error
 		d, err = db.NewDB[notifications.Subscription]()
