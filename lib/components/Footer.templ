@@ -1,22 +1,18 @@
 package components
 
 templ Footer() {
-	<footer class="flex text-warm-700 flex-col gap-2 py-2 items-center border-solid border-t border-warm-300">
-		<div class="flex gap-2">
-			@A(templ.Attributes{"href": "/"}) {
-				Home
-			}
-			@A(templ.Attributes{"href": "/blog"}) {
-				Blog
-			}
-			@A(templ.Attributes{"href": "/contact"}) {
-				Contact
-			}
-			@A(templ.Attributes{"id": "subscribe"}) {
-				Secret link
-			}
-		</div>
-		<span>Site built by William Bradshaw</span>
+	<footer class="flex text-warm-700 flex-row gap-2 py-2 px-3 items-center justify-between sm:justify-center border-solid border-t border-warm-300">
+		@A(templ.Attributes{"href": "/"}) {
+			Home
+		}
+		@A(templ.Attributes{"href": "/blog"}) {
+			Blog
+		}
+		@A(templ.Attributes{"href": "/contact"}) {
+			Contact
+		}
+		@A(templ.Attributes{"id": "subscribe"}) {
+			Secret link
+		}
 	</footer>
 }
-

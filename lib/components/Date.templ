@@ -1,0 +1,21 @@
+package components 
+
+import (
+	"time"
+	"github.com/will-lol/personalWebsiteAwesome/lib/merge"
+)
+
+templ Date(date time.Time, id string, attrs templ.Attributes) {
+	<span { merge.MergeAttrs(attrs, templ.Attributes{ "id": id })... }>
+		@dateFiller(id, date)
+	</span>
+}
+
+script dateFiller(id string, date time.Time) {
+	document.getElementById(id).innerText = (new Date(date)).toLocaleDateString(undefined, {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+}
+

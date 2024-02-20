@@ -3,8 +3,10 @@ package blog
 import (
 	"github.com/will-lol/personalWebsiteAwesome/lib/components"
 	b "github.com/will-lol/personalWebsiteAwesome/services/blog"
-	"time"
 	"github.com/will-lol/personalWebsiteAwesome/lib/pointerify"
+	"github.com/will-lol/personalWebsiteAwesome/services/eid"
+	"log/slog"
+	"sort"
 )
 
 templ blog(blog b.Blog) {
@@ -13,20 +15,43 @@ templ blog(blog b.Blog) {
 			@components.Header() {
 				Blog
 			}
-			for _, item := range pointerify.DePointer(blog.GetAllPosts()) {
-				@postPreview(item)
-			}
+			<div class="flex flex-col gap-2">
+				@postList(mapToSortedPosts(pointerify.DePointer(blog.GetAllPosts())))
+			</div>
+		}
+	}
+}
+
+func mapToSortedPosts(posts map[string]*b.Post) []*b.Post { 
+	arr := make([]*b.Post, 0, len(posts))
+	for _, post := range posts { 
+		arr = append(arr, post)
+	}
+	sort.Slice(arr, func(i, j int) bool { 
+		return arr[i].Frontmatter.Date.Before(arr[j].Frontmatter.Date)
+	})
+	return arr
+}
+
+templ postList(posts []*b.Post) {
+	for i, item := range posts {
+		@postPreview(item)
+		if (i != len(posts) - 1) {
+			<hr class="border-warm-300 border-2 border-dotted"></hr>
 		}
 	}
 }
 
 templ postPreview(post *b.Post) {
-	<div>
-		{ post.Frontmatter.Title }
-		{ post.Frontmatter.Description }
-		{ post.Frontmatter.Date.Format(time.RFC1123) }
-		<div>
-			@templ.Raw(post.Content)
+	<a class="block" href={ templ.URL("/blog/" + post.Frontmatter.Slug) }>
+		<div class="font-semibold text-2xl font-serif">
+			{ post.Frontmatter.Title }
 		</div>
-	</div>
+		<div>
+			@components.Date(post.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{"class": "text-warm-700"})
+		</div>
+		<div>
+			{ post.Frontmatter.Description }
+		</div>
+	</a>
 }

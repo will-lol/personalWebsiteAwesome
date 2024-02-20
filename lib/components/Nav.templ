@@ -6,9 +6,9 @@ templ Nav() {
 			W. Bradshaw	
 		</a>
 		<div class="flex flex-row gap-2">
-			@NavLink(templ.URL("/")) { Home }
-			@NavLink(templ.URL("/blog")) { Blog }
-			@NavLink(templ.URL("/contact")) { Contact }
+			@NavLink(templ.URL("/"), true) { Home }
+			@NavLink(templ.URL("/blog"), true) { Blog }
+			@NavLink(templ.URL("mailto:will.bradshaw50@gmail.com?subject=Website%20Query"), false) { Contact }
 		</div>
 	</nav>
 }

@@ -79,7 +79,7 @@ func NewFullWidthCarouselModel(photos []CarouselPhoto, ctx context.Context) (m F
 templ FullWidthCarousel(m FullWidthCarouselModel) {
 	<div id={ m.RootID } class="overflow-hidden relative">
 		<div class="z-10 absolute inset-0 bg-vignette"></div>
-		<div id={ m.CarouselID } class="max-w-none h-[80svh] flex flex-nowrap">
+		<div id={ m.CarouselID } class="max-w-none md:h-[80svh] h-[90svh] flex flex-nowrap">
 			@images(m.Photos, m.IDs)
 			@images(m.Photos, m.IDs)
 		</div>

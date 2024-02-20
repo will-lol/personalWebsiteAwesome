@@ -28,8 +28,8 @@ func currentHrefIsLink(linkHref *url.URL, currentHref *url.URL) bool {
 	return currentPath == strings.Trim(linkHref.Path, "/")  
 }
 
-templ NavLink(href templ.SafeURL) {
-	<a class={ "text-warm-800", templ.KV("underline", currentHrefIsLink(stringToURL(string(href)), getCurrentUrl(ctx))) } href={ href }>
+templ NavLink(href templ.SafeURL, urlDetection bool) {
+	<a class={ "text-warm-800", templ.KV("underline", urlDetection && currentHrefIsLink(stringToURL(string(href)), getCurrentUrl(ctx))) } href={ href }>
 		{ children... }
 	</a>
 }
