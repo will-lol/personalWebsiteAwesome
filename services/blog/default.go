@@ -8,7 +8,9 @@ import (
 	"time"
 
 	fm "github.com/adrg/frontmatter"
-	"github.com/kaleocheng/goldmark"
+	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
+	"github.com/yuin/goldmark/extension"
 )
 
 type blog struct {
@@ -93,7 +95,15 @@ func parsePost(file *SimpleFile) (*Post, error) {
 	}
 
 	var buff bytes.Buffer
-	if err := goldmark.Convert(rest, &buff); err != nil {
+	md := goldmark.New(
+		goldmark.WithExtensions(
+			extension.GFM, 
+			highlighting.NewHighlighting(
+				highlighting.WithStyle("pygments"),
+			),
+		),
+	)
+	if err := md.Convert(rest, &buff); err != nil {
 		return nil, err
 	}
 
