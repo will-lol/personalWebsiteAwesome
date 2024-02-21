@@ -1,5 +1,5 @@
 ---
-title: Building will.forsale
+title: What I learnt building will.forsale in Go
 date: 2024-02-20
 slug: website
 description: >
