@@ -12,9 +12,7 @@ import (
 templ blog(blog b.Blog) {
 	@components.Layout("Blog") {
 		@components.Main() {
-			@components.Header() {
-				Blog
-			}
+			@components.Header("Blog") 
 			<div class="flex flex-col gap-2">
 				@postList(mapToSortedPosts(pointerify.DePointer(blog.GetAllPosts())))
 			</div>
@@ -28,7 +26,7 @@ func mapToSortedPosts(posts map[string]*b.Post) []*b.Post {
 		arr = append(arr, post)
 	}
 	sort.Slice(arr, func(i, j int) bool { 
-		return arr[i].Frontmatter.Date.Before(arr[j].Frontmatter.Date)
+		return arr[i].Frontmatter.Date.After(arr[j].Frontmatter.Date)
 	})
 	return arr
 }

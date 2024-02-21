@@ -10,8 +10,7 @@ import (
 templ postPage(blogPost *blogService.Post) {
 	@components.Layout(blogPost.Frontmatter.Title) {
 		@components.Main() {
-			@components.Header() {
-				{ blogPost.Frontmatter.Title }
+			@components.Header(blogPost.Frontmatter.Title) {
 				<div class="text-base text-warm-700">
 					@components.Date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "font-sans" })
 				</div>

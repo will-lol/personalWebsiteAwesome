@@ -1,7 +1,10 @@
 package components
 
-templ Header() {
-	<div class="font-serif flex flex-col gap-2 text-5xl md:pt-40 pt-28 pb-2">
+templ Header(title string) {
+	<div class="font-serif flex flex-col gap-2 md:pt-40 pt-28 pb-2">
+		<div class="text-5xl">
+			{ title }
+		</div>
 		{ children... }
 		<hr class="border-warm-300"></hr>
 	</div>

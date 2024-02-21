@@ -16,6 +16,13 @@ module.exports = {
     },
     extend: {
       typography: ({ theme }) => ({
+        DEFAULT: {
+          css: {
+            "*": {
+              maxWidth: "65ch",
+            }
+          },
+        },
         warm: {
           css: {
             '--tw-prose-body': theme('colors.warm[800]'),
