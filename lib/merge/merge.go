@@ -1,8 +1,9 @@
 package merge
 
 import (
-	"github.com/a-h/templ"
 	"strings"
+
+	"github.com/a-h/templ"
 )
 
 func MergeAttrs(attrs1 templ.Attributes, attrs2 templ.Attributes) templ.Attributes {
