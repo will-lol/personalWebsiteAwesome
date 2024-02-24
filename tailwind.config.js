@@ -11,18 +11,12 @@ module.exports = {
       padding: '0.5rem',
     },
     screens: {
+      "hidpi": { "raw": "(-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi)" },
       "sm": "450px",
       "md": "768px",
     },
     extend: {
       typography: ({ theme }) => ({
-        DEFAULT: {
-          css: {
-            "*": {
-              maxWidth: "65ch",
-            }
-          },
-        },
         warm: {
           css: {
             '--tw-prose-body': theme('colors.warm[800]'),
