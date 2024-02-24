@@ -69,8 +69,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 			"BLOG_BUCKET_NAME":         blogBucket.BucketName(),
 			"SECRET_ARN":               &secretArn,
 		},
-		ParamsAndSecrets: awslambda.ParamsAndSecretsLayerVersion_FromVersion(awslambda.ParamsAndSecretsVersions_V1_0_103, &awslambda.ParamsAndSecretsOptions{
-		}),
+		ParamsAndSecrets: awslambda.ParamsAndSecretsLayerVersion_FromVersion(awslambda.ParamsAndSecretsVersions_V1_0_103, &awslambda.ParamsAndSecretsOptions{}),
 	})
 
 	a.GrantRead(f, nil)
@@ -117,8 +116,18 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 			Origin:               lambdaOrigin,
 			CachedMethods:        awscloudfront.CachedMethods_CACHE_GET_HEAD(),
 			OriginRequestPolicy:  awscloudfront.OriginRequestPolicy_ALL_VIEWER_EXCEPT_HOST_HEADER(),
-			CachePolicy:          awscloudfront.CachePolicy_CACHING_DISABLED(),
+			CachePolicy:          awscloudfront.CachePolicy_CACHING_OPTIMIZED(),
 			ViewerProtocolPolicy: awscloudfront.ViewerProtocolPolicy_REDIRECT_TO_HTTPS,
+		},
+		AdditionalBehaviors: &map[string]*awscloudfront.BehaviorOptions{
+			"/api/*": &awscloudfront.BehaviorOptions{
+				AllowedMethods:       awscloudfront.AllowedMethods_ALLOW_ALL(),
+				Origin:               lambdaOrigin,
+				CachedMethods:        awscloudfront.CachedMethods_CACHE_GET_HEAD(),
+				OriginRequestPolicy:  awscloudfront.OriginRequestPolicy_ALL_VIEWER_EXCEPT_HOST_HEADER(),
+				CachePolicy:          awscloudfront.CachePolicy_CACHING_DISABLED(),
+				ViewerProtocolPolicy: awscloudfront.ViewerProtocolPolicy_REDIRECT_TO_HTTPS,
+			},
 		},
 	})
 
