@@ -6,21 +6,22 @@ import (
 	"time"
 
 	"strconv"
+	"github.com/will-lol/personalWebsiteAwesome/services/icon"
+	"log/slog"
 )
 
-templ index() {
+templ index(i icon.IconFinder) {
 	@components.Layout("Home") {
 		<script type="module" src="assets/js/index/notifications.js"></script>
-		<div class="px-2 pt-2">
+		<div class="px-2 pt-3 sm:pt-2">
 			@components.FullWidthCarousel(components.NewFullWidthCarouselModel([]components.CarouselPhoto{
-				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/grass.avif"), "Me with my beloved X1 Carbon on the grass outside"),
 				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/walk.avif"), "Me on the South Coast Track in Tasmania"),
 				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/laptop.avif"), "NixOS (screen is a little dim)"),
 				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/server.avif"), "My Dell Optiplex server (I couldn't quite put the side panel on after adding some extra drives)"),
 				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/wallpaper.avif"), "My phone wallpaper, a picture taken from a hill near my house"),
 			}, ctx))
 		</div>
-		@components.Main() {
+		@components.Main(templ.Attributes{"class": "flex flex-col gap-2"}) {
 			@components.Prose() {
 				<p>
 					Hello, I'm Will. I'm a software developer and I built this website that can send me push notifications. Go ahead, try it: 
@@ -29,11 +30,127 @@ templ index() {
 					}
 				</p>
 				<p>
-					I'm { strconv.Itoa(int(getAge().Hours() / 8766)) } and learning about software. Computers have always interested me. Using them to do precisely what I want is why I keep building things with them. Some of what I've done is listed below.
+					I'm { strconv.Itoa(int(getAge().Hours() / 8766)) } and learning about software. Computers have always interested me. Using them to do precisely what I want is why I keep building things with them. Some of what I've done is listed below:
 				</p>
 			}
+			@projects([]project{
+				{
+					Name: "will.forsale",
+					Description: "This website! I have already written a long post about it.",
+					Post: pointerify.Pointer(templ.URL("/blog/website")),
+					HostedURL: nil,
+					GitHub: pointerify.Pointer(templ.URL("https://github.com/will-lol/personalWebsiteAwesome")),
+					Technologies: []string{"amazonwebservices", "tailwindcss", "go"},
+				},
+				{
+					Name: "NixOS Dotfiles",
+					Description: "NixOS is my operating system on both my laptop and my desktop. Since installing, I have trawled through documentation trying to build my perfect configuration. The .dotfiles are an ongoing project.",
+					Post: nil,
+					HostedURL: nil,
+					GitHub: pointerify.Pointer(templ.URL("https://github.com/will-lol/.dotfiles")),
+					Technologies: []string{"nixos"},
+				},
+				{
+					Name: "iPod Listening Statistics",
+					Description: "My major assessment for Computer Science was a website to generate iPod listening statistics using exported data from iTunes. The project is written uses SvelteKit and TypeScript. It also features authentication (which is a little dodgy) using GitHub.",
+					Post: nil,
+					HostedURL: pointerify.Pointer(templ.URL("https://computer-science-ia.vercel.app/")),
+					GitHub: pointerify.Pointer(templ.URL("https://github.com/will-lol/.dotfiles")),
+					Technologies: []string{"svelte", "tailwindcss", "typescript", "vercel", "amazonwebservices", "wasm"},
+				},
+				{
+					Name: "noise",
+					Description: "An app I created while procrastinating my studies to generate customised white noise. It is also a very fun creative tool to make cool sounds. It is written in pure JavaScript as I was learning the language at the time. The app is built using tauri.",
+					Post: nil,
+					HostedURL: nil,
+					GitHub: pointerify.Pointer(templ.URL("https://github.com/will-lol/noise")),
+					Technologies: []string{"tauri", "javascript"},
+				},
+				{
+					Name: "Secret Sharer",
+					Description: "I never quite trusted those websites that allow you to share encrypted secrets, so I built my own! I'm pretty sure its secure but I'm no expert.",
+					Post: nil,
+					HostedURL: pointerify.Pointer(templ.URL("https://secret-sharer-will-lol.vercel.app/")),
+					GitHub: pointerify.Pointer(templ.URL("https://github.com/will-lol/SecretSharer")),
+					Technologies: []string{"tailwindcss", "solidjs", "typescript", "amazonwebservices", "vercel"},
+				},
+				{
+					Name: "Valleyfield New Norfolk",
+					Description: "The official website of Valleyfield New Norfolk was built by me using Webflow",
+					Post: nil,
+					HostedURL: pointerify.Pointer(templ.URL("http://valleyfieldnewnorfolk.com.au/")),
+					Technologies: []string{"webflow"},
+				},
+			}, i)
 		}
 	}
+}
+
+type project struct {
+	Name         string
+	Description  string
+	Post         *templ.SafeURL
+	GitHub       *templ.SafeURL
+	HostedURL    *templ.SafeURL
+	Technologies []string
+}
+
+templ projects(projects []project, i icon.IconFinder) {
+	<ul class="flex flex-col gap-2">
+		for _, projectData := range projects {
+			@projectComponent(NewProjectViewModel(projectData, i))
+		}
+	</ul>
+}
+
+type ProjectViewModel struct {
+	Project project
+	Icons   []*string
+}
+
+func NewProjectViewModel(project project, ic icon.IconFinder) ProjectViewModel {
+	arr := make([]*string, 0, len(project.Technologies))
+	for _, technology := range project.Technologies {
+		iconSrc, err := ic.Find(technology)
+		if err != nil {
+			slog.Default().Error(err.Error())
+		}
+		arr = append(arr, iconSrc)
+	}
+	return ProjectViewModel{
+		Project: project,
+		Icons:   arr,
+	}
+}
+
+templ projectComponent(project ProjectViewModel) {
+	<li class="bg-warm-200 px-3 py-2">
+		<span class="text-warm-700 text-xs">PROJECT</span>
+		<div class="flex flex-wrap gap-2 items-center">
+			<div class="font-serif text-lg font-semibold">
+				{ project.Project.Name }
+			</div>
+			<div class="flex gap-2 py-2">
+				for i, technology := range project.Icons {
+					<img title={ project.Project.Technologies[i] } alt={ project.Project.Technologies[i] + " icon" } class="aspect-square h-4" src={ *technology }/>
+				}
+			</div>
+		</div>
+		<div class="prose">
+			{ project.Project.Description }
+			<div class="flex flex-wrap gap-2">
+				if project.Project.GitHub != nil {
+					<a class="block" href={ *project.Project.GitHub }>GitHub repoistory</a>
+				}
+				if project.Project.HostedURL != nil {
+					<a class="block" href={ *project.Project.HostedURL }>Website</a>
+				}
+				if project.Project.Post != nil {
+					<a class="block" href={ *project.Project.Post }>Blog post</a>
+				}
+			</div>
+		</div>
+	</li>
 }
 
 func getAge() time.Duration {
