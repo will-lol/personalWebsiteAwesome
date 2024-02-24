@@ -11,6 +11,7 @@ import (
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/renderer/html"
 )
 
 type blog struct {
@@ -95,14 +96,18 @@ func parsePost(file *SimpleFile) (*Post, error) {
 	}
 
 	var buff bytes.Buffer
+
 	md := goldmark.New(
+		goldmark.WithRendererOptions(html.WithUnsafe()),
 		goldmark.WithExtensions(
-			extension.GFM, 
+			extension.GFM,
 			highlighting.NewHighlighting(
 				highlighting.WithStyle("pygments"),
 			),
+			extension.Typographer,
 		),
 	)
+
 	if err := md.Convert(rest, &buff); err != nil {
 		return nil, err
 	}
