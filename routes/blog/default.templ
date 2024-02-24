@@ -11,32 +11,29 @@ import (
 
 templ blog(blog b.Blog) {
 	@components.Layout("Blog") {
-		@components.Main() {
-			@components.Header("Blog") 
-			<div class="flex flex-col gap-2">
+		@components.Main(templ.Attributes{}) {
+			@components.Header("Blog")
+			<div class="flex flex-col gap-4 py-2">
 				@postList(mapToSortedPosts(pointerify.DePointer(blog.GetAllPosts())))
 			</div>
 		}
 	}
 }
 
-func mapToSortedPosts(posts map[string]*b.Post) []*b.Post { 
+func mapToSortedPosts(posts map[string]*b.Post) []*b.Post {
 	arr := make([]*b.Post, 0, len(posts))
-	for _, post := range posts { 
+	for _, post := range posts {
 		arr = append(arr, post)
 	}
-	sort.Slice(arr, func(i, j int) bool { 
+	sort.Slice(arr, func(i, j int) bool {
 		return arr[i].Frontmatter.Date.After(arr[j].Frontmatter.Date)
 	})
 	return arr
 }
 
 templ postList(posts []*b.Post) {
-	for i, item := range posts {
+	for _, item := range posts {
 		@postPreview(item)
-		if (i != len(posts) - 1) {
-			<hr class="border-warm-300 border-2 border-dotted"></hr>
-		}
 	}
 }
 
