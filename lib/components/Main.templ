@@ -1,7 +1,11 @@
 package components
 
-templ Main() {
-	<div class="max-w-prose mx-auto px-3 py-2">
+import (
+	"github.com/will-lol/personalWebsiteAwesome/lib/merge"
+)
+
+templ Main(attrs templ.Attributes) {
+	<div { merge.MergeAttrs(attrs, templ.Attributes{"class": "max-w-prose mx-auto px-3 py-2"})... } >
 		{ children... }
 	</div>
 }

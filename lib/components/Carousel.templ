@@ -79,7 +79,7 @@ func NewFullWidthCarouselModel(photos []CarouselPhoto, ctx context.Context) (m F
 templ FullWidthCarousel(m FullWidthCarouselModel) {
 	<div id={ m.RootID } class="overflow-hidden relative">
 		<div class="z-10 absolute inset-0 bg-vignette"></div>
-		<div id={ m.CarouselID } class="max-w-none md:h-[85svh] h-[90svh] flex flex-nowrap">
+		<div id={ m.CarouselID } class="max-w-none h-[85svh] flex flex-nowrap">
 			@images(m.Photos, m.IDs)
 			@images(m.Photos, m.IDs)
 		</div>
@@ -190,7 +190,7 @@ templ images(photos []CarouselPhoto, ids []string) {
 
 templ noisyImg(attrs templ.Attributes) {
 	<div class="relative h-full shrink-0 grow-0">
-		<div class="absolute z-10 opacity-10 pointer-events-none bg-repeat inset-0 bg-noise"></div>
+		<div class="absolute z-10 opacity-10 pointer-events-none bg-repeat hidpi:bg-[length:128px_128px] inset-0 bg-noise"></div>
 		<img class="h-full" { attrs... }/>
 	</div>
 }
