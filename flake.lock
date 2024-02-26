@@ -3,7 +3,6 @@
     "aws-cdk": {
       "flake": false,
       "locked": {
-        "lastModified": 1706747159,
         "narHash": "sha256-tcrB43K3OVM4cqiPhE1eAbiMIF2x/abOk/suhz/zGqE=",
         "type": "tarball",
         "url": "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.124.0.tgz"
