@@ -3,7 +3,7 @@ title: Making Spotify Wrapped for iTunes.xml files using TreeSitter ... in 2024
 date: 2024-02-22
 slug: itunes-xml
 description: >
-  iTunes for Windows and MacOS offer data export in the form of XML files. As part of my major computer science assessment, I build a parser for these files to extract listening statistics.
+  iTunes for Windows and MacOS offers data export in the form of XML files. As part of my major computer science assessment, I build a parser for these files to extract listening statistics.
 ---
 Library export was a feature added to iTunes that allowed developers to build integrations with it. Now that the iPod has had its resurgence, many find themselves in the position of using this two decade old digital music library. 
 
@@ -11,7 +11,7 @@ Given that streaming services like Apple Music and Spotify are incentivised by t
 
 However, there has been one major innovation in the digital music library space that iTunes simply does not feature. The annual statistical summary. I knew I had to take iTunes' ancient XML export feature and turn it into a Spotify Wrapped inspired experience for all of the iPod users of today.
 
-An application such as this one is expected by users to run in their web browser. So what language is better used to parse an exported iTunes.XML file in than the web's flagship language: JavaScript.
+An application such as this one is expected by users to run in their web browser. So what language is better used to parse an exported iTunes.XML file than the web's flagship language: JavaScript.
 
 I considered the DOMParser API and XML parsers more broadly, but concluded that building my own would be more fun. These options would also only bring me slightly closer to a JavaScript object of a user's library, since they do not understand how an iTunes.XML file specifically is formatted.
 
@@ -57,7 +57,7 @@ module.exports = grammar({
 })
 ```
 
-My grammar certainly isn't perfect. This is my first try!
+My grammar certainly isn't perfect. This is my first time writing one!
 
 Each 'rule' in 'rules' defines a construct that exists in the file. Rules prefixed with '\_' will not appear in the final syntax tree. You usually use these for wrappers like `_expression` or in `_boolean`, where I didn't want a `_boolean` construct surrounding the actual value of `true` or `false`. An [example iTunes.XML](https://github.com/will-lol/ComputerScienceIA/blob/main/tests/test.xml) is available.
 
