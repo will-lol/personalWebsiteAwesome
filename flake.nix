@@ -45,7 +45,7 @@
 	  };
 	  defaultPackage = goBuild;
 	  devShell = pkgs.mkShell {
-	    packages = [ pkgs.tailwindcss pkgs.entr pkgs.nodePackages.typescript-language-server pkgs.fd pkgs.go-task pkgs.nodejs_18 pkgs.awscli2 pkgs.aws-sam-cli pkgs.go pkgs.gopls templ cdk ];
+	    packages = [ pkgs.tailwindcss pkgs.entr pkgs.nodePackages.typescript-language-server pkgs.fd pkgs.nodejs_18 pkgs.awscli2 pkgs.aws-sam-cli pkgs.go pkgs.gopls templ cdk ];
 	    shellHook = ''
 	      export ENVIRONMENT=dev
 	    '';
