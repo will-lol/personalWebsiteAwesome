@@ -2,19 +2,30 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/aws/aws-cdk-go/awscdk/v2"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awscertificatemanager"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfront"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfrontorigins"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53targets"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3deployment"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awssecretsmanager"
 	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
+	"github.com/will-lol/personalWebsiteAwesome/lib/pointerify"
 )
+
+const githubRepo = "will-lol/personalWebsiteAwesome"
+const route53ZoneId = "Z02978271FWSW4APEXXR7"
+const route53ZoneName = "will.forsale"
+const certificateArn = "arn:aws:acm:us-east-1:301436506805:certificate/8ffebb3c-d608-4f0a-bbb7-4b6e1b1b23c1"
+const vapidSecretsArn = "arn:aws:secretsmanager:ap-southeast-2:301436506805:secret:website/vapid-keys-WIfxAO"
 
 type CommandHook struct{}
 
@@ -46,8 +57,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
 	})
 
-	secretArn := "arn:aws:secretsmanager:ap-southeast-2:301436506805:secret:website/vapid-keys-WIfxAO"
-	a := awssecretsmanager.Secret_FromSecretCompleteArn(stack, jsii.String("SecretFromCompleteArn"), jsii.String(secretArn))
+	a := awssecretsmanager.Secret_FromSecretCompleteArn(stack, jsii.String("SecretFromCompleteArn"), jsii.String(vapidSecretsArn))
 
 	blogBucket := awss3.NewBucket(stack, jsii.String("blog"), &awss3.BucketProps{
 		BlockPublicAccess: awss3.BlockPublicAccess_BLOCK_ALL(),
@@ -67,7 +77,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 			"SUBSCRIPTIONS_TABLE_NAME": subscriptions.TableName(),
 			"METADATA_TABLE_NAME":      metadata.TableName(),
 			"BLOG_BUCKET_NAME":         blogBucket.BucketName(),
-			"SECRET_ARN":               &secretArn,
+			"SECRET_ARN":               jsii.String(vapidSecretsArn),
 		},
 		ParamsAndSecrets: awslambda.ParamsAndSecretsLayerVersion_FromVersion(awslambda.ParamsAndSecretsVersions_V1_0_103, &awslambda.ParamsAndSecretsOptions{}),
 	})
@@ -110,7 +120,12 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 	lambdaOrigin := awscloudfrontorigins.NewHttpOrigin(lambdaURLDomain, &awscloudfrontorigins.HttpOriginProps{
 		ProtocolPolicy: awscloudfront.OriginProtocolPolicy_HTTPS_ONLY,
 	})
+
+	cert := awscertificatemanager.Certificate_FromCertificateArn(stack, jsii.String("willforsale_cert"), jsii.String(certificateArn))
 	cf := awscloudfront.NewDistribution(stack, jsii.String("customerFacing"), &awscloudfront.DistributionProps{
+		HttpVersion: awscloudfront.HttpVersion_HTTP2_AND_3,
+		Certificate: cert,
+		DomainNames: jsii.Strings("will.forsale", "www.will.forsale"),
 		DefaultBehavior: &awscloudfront.BehaviorOptions{
 			AllowedMethods:       awscloudfront.AllowedMethods_ALLOW_ALL(),
 			Origin:               lambdaOrigin,
@@ -120,7 +135,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 			ViewerProtocolPolicy: awscloudfront.ViewerProtocolPolicy_REDIRECT_TO_HTTPS,
 		},
 		AdditionalBehaviors: &map[string]*awscloudfront.BehaviorOptions{
-			"/api/*": &awscloudfront.BehaviorOptions{
+			"/api/*": {
 				AllowedMethods:       awscloudfront.AllowedMethods_ALLOW_ALL(),
 				Origin:               lambdaOrigin,
 				CachedMethods:        awscloudfront.CachedMethods_CACHE_GET_HEAD(),
@@ -161,6 +176,50 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 		Sources: &[]awss3deployment.ISource{
 			awss3deployment.Source_Asset(jsii.String("../blog"), nil),
 		},
+	})
+
+	hostedZone := awsroute53.PublicHostedZone_FromPublicHostedZoneAttributes(stack, jsii.String(route53ZoneId), &awsroute53.PublicHostedZoneAttributes{
+		HostedZoneId: jsii.String(route53ZoneId),
+		ZoneName:     jsii.String(route53ZoneName),
+	})
+	awsroute53.NewARecord(stack, jsii.String("CfRecordA"), &awsroute53.ARecordProps{
+		Zone:   hostedZone,
+		Target: awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(cf)),
+	})
+	awsroute53.NewAaaaRecord(stack, jsii.String("CfRecordAaaa"), &awsroute53.AaaaRecordProps{
+		Zone:   hostedZone,
+		Target: awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(cf)),
+	})
+
+	// GitHub actions config
+	ghOidc := awsiam.NewOpenIdConnectProvider(stack, jsii.String("GhActionOidcProvider"), &awsiam.OpenIdConnectProviderProps{
+		Url:         jsii.String("https://token.actions.githubusercontent.com"),
+		ClientIds:   jsii.Strings("sts.amazonaws.com"),
+		Thumbprints: jsii.Strings("ffffffffffffffffffffffffffffffffffffffff"),
+	})
+
+	ghActionRole := awsiam.NewRole(stack, jsii.String("GhActionRole"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewFederatedPrincipal(ghOidc.OpenIdConnectProviderArn(), &map[string]interface{}{
+			"StringLike": map[string]interface{}{
+				"token.actions.githubusercontent.com:sub": fmt.Sprintf("repo:%s:*", githubRepo),
+			},
+		}, jsii.String("sts:AssumeRoleWithWebIdentity")),
+		MaxSessionDuration: awscdk.Duration_Hours(jsii.Number(1)),
+		InlinePolicies: &map[string]awsiam.PolicyDocument{
+			"CdkDeploymentPolicy": awsiam.NewPolicyDocument(&awsiam.PolicyDocumentProps{
+				AssignSids: jsii.Bool(true),
+				Statements: pointerify.Pointer([]awsiam.PolicyStatement{awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+					Effect:    awsiam.Effect_ALLOW,
+					Actions:   jsii.Strings("sts:AssumeRole"),
+					Resources: jsii.Strings(fmt.Sprintf("arn:aws:iam::%s:role/cdk-*", *stack.Account())),
+				})}),
+			}),
+		},
+	})
+
+	awscdk.NewCfnOutput(stack, jsii.String("actionRoleArn"), &awscdk.CfnOutputProps{
+		Value:      ghActionRole.RoleArn(),
+		ExportName: jsii.String("actionRoleArn"),
 	})
 
 	return stack

@@ -1,2 +1,27 @@
-- name: "Configure AWS Credentials" Action for GitHub Actions
-  uses: aws-actions/configure-aws-credentials@v4.0.2
+name: "CDK Deploy"
+on:
+  push:
+env: 
+  AWS_REGION: "ap-southeast-2"
+  IAM_ROLE: "arn:aws:iam::301436506805:role/WebsiteStack-GhActionRole736F37DC-AsvkLQkqWN4g"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Git clone the repo
+      uses: actions/checkout@v3
+    - name: Configure AWS credentials 
+      uses: aws-actions/configure-aws-credentials@v4.0.2
+      with: 
+        aws-region: ${{ env.AWS_REGION }}
+        role-session-name: cdkdeploygithubaction
+        role-to-assume: ${{ env.IAM_ROLE }}
+    - name: Install Nix
+    - uses: cachix/install-nix-action@v22
+      with: 
+        nix_path: nixpkgs=channel:nixos-unstable
+    - name: Deploy
+      run: nix develop --command bash -c "cd cdk && cdk deploy"

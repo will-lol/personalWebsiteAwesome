@@ -6,7 +6,7 @@ require (
 	github.com/SherClockHolmes/webpush-go v1.3.0
 	github.com/a-h/templ v0.2.543
 	github.com/akrylysov/algnhsa v1.0.0
-	github.com/aws/aws-cdk-go/awscdk/v2 v2.122.0
+	github.com/aws/aws-cdk-go/awscdk/v2 v2.130.0
 	github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2 v2.122.0-alpha.0
 	github.com/aws/aws-sdk-go-v2 v1.25.0
 	github.com/aws/aws-sdk-go-v2/config v1.26.2
@@ -41,7 +41,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.21.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.26.6 // indirect
 	github.com/aws/smithy-go v1.20.0 // indirect
-	github.com/cdklabs/awscdk-asset-awscli-go/awscliv1/v2 v2.2.201 // indirect
+	github.com/cdklabs/awscdk-asset-awscli-go/awscliv1/v2 v2.2.202 // indirect
 	github.com/cdklabs/awscdk-asset-kubectl-go/kubectlv20/v2 v2.1.2 // indirect
 	github.com/cdklabs/awscdk-asset-node-proxy-agent-go/nodeproxyagentv6/v2 v2.0.1 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
