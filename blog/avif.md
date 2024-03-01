@@ -5,7 +5,7 @@ slug: avif
 description: >
   Do the benefits of this image codec based on AV1 really mean you should stop using JPEG? Read my 4000 word essay.
 ---
-A requirement of the IB Diploma Programme is a 4000 word extended essay on a topic of your choosing. Mine? Image codecs. You can read the full document [here](/assets/blog/avif/doc.pdf), or read just the introduction below:
+A requirement of the IB Diploma Programme is a 4000 word extended essay on a topic of your choosing. Mine? Image codecs. You can read the full document [here](https://drive.google.com/file/d/1RHneRVJqwx7xFIVtr9h4qA-wuUa4VH8g/view?usp=sharing), or read just the introduction below:
 
 Modern displays contain thousands of pixels, each of which are capable of displaying colours by varying the amount of red, green or blue that is output. In order to store an image digitally, each pixel is a colour represented by three numbers that correspond to an amount of red, green and blue. In a 24 bit colour system, a digital representation of a single pixel may encode each colour’s component with 8 successive bytes. For example, <span style="background-color: #33e310;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> (in R→G→B order) is: 00110011 11100011 00010000. 
 
