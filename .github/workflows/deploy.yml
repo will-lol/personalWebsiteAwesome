@@ -20,8 +20,8 @@ jobs:
         role-session-name: cdkdeploygithubaction
         role-to-assume: ${{ env.IAM_ROLE }}
     - name: Install Nix
-      uses: cachix/install-nix-action@v22
-      with: 
-        nix_path: nixpkgs=channel:nixos-unstable
+      uses: DeterminateSystems/nix-installer-action@main
+    - name: Nix Cache
+      uses: DeterminateSystems/magic-nix-cache-action@main
     - name: Deploy
       run: nix develop --command bash -c "cd cdk && cdk deploy"
