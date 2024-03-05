@@ -22,6 +22,7 @@ templ index(i icon.IconFinder) {
 			}, ctx))
 		</div>
 		@components.Main(templ.Attributes{"class": "flex flex-col gap-2"}) {
+			@hCard()
 			@components.Prose() {
 				<p>
 					Hello, I'm Will. I'm a software developer and I built this website that can send me push notifications. Go ahead, try it: 
@@ -29,8 +30,9 @@ templ index(i icon.IconFinder) {
 						Send me a notification
 					}
 				</p>
+				<p></p>
 				<p>
-					I'm { strconv.Itoa(int(getAge().Hours() / 8766)) } and learning about software. Computers have always interested me. Using them to do precisely what I want is why I keep building things with them. Some of what I've done is listed below:
+					I'm { strconv.Itoa(int(getAge().Hours() / 8766)) } and learning about software. I publish all of my work to <a href="https://github.com/will-lol/" rel="me">GitHub</a>. Computers have always interested me. Using them to do precisely what I want is why I keep building things with them. Some of what I've done is listed below:
 				</p>
 			}
 			@projects([]project{
@@ -84,6 +86,15 @@ templ index(i icon.IconFinder) {
 			}, i)
 		}
 	}
+}
+
+templ hCard() {
+	<div class="h-card hidden">
+		<p class="p-name">William Bradshaw</p>
+		<a class="u-url" href="https://will.forsale"></a>
+		<a class="u-email" rel="me" href="mailto:will.bradshaw50@gmail.com"></a>
+		<p class="p-note">My personal blog following my learnings with technology</p>
+	</div>
 }
 
 type project struct {
