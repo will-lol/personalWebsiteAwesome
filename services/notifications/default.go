@@ -146,11 +146,14 @@ func (n notificationsService) Notify() (err error) {
 }
 
 func (n notificationsService) notifySubscriber(sub Subscription) error {
+	n.Log.Debug("notify subscriber")
 	pub, err := n.GetPubKey()
 	priv, err := n.GetPrivKey()
 	if err != nil {
 		return err
 	}
+	n.Log.Debug("got keys")
+	n.Log.Debug("sending using webpush")
 	resp, err := webpush.SendNotification([]byte("Notification received"), &sub, &webpush.Options{
 		VAPIDPublicKey:  *pub,
 		VAPIDPrivateKey: *priv,
@@ -160,7 +163,9 @@ func (n notificationsService) notifySubscriber(sub Subscription) error {
 	if err != nil {
 		return err
 	}
+	n.Log.Debug("sent")
 	if resp.StatusCode == 410 {
+		n.Log.Debug("deleting")
 		n.db.DeleteObject(sub)
 	}
 	return nil
