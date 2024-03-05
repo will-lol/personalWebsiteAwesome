@@ -12,7 +12,7 @@ import (
 
 templ index(i icon.IconFinder) {
 	@components.Layout("Home") {
-		<script type="module" src="assets/js/index/notifications.js"></script>
+		<script type="module" src="assets/js/routes/index/notifications.js"></script>
 		<div class="px-2 pt-3 sm:pt-2">
 			@components.FullWidthCarousel(components.NewFullWidthCarouselModel([]components.CarouselPhoto{
 				components.NewCarouselPhoto(nil, nil, pointerify.Pointer("assets/images/server.avif"), "My Dell Optiplex server (I couldn't quite put the side panel on after adding some extra drives)"),

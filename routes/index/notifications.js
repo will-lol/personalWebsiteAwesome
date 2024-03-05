@@ -1,4 +1,4 @@
-import { registration } from '/assets/js/util/components/sw-register.js'
+import { registration } from '/assets/js/lib/components/sw-register.js'
 
 document.getElementById("subscribe").addEventListener('click', async (e) => {
   const subscription = await registration.pushManager.subscribe({
