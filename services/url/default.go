@@ -13,6 +13,7 @@ const hostname = "will.forsale"
 func GetURL(ctx context.Context) (*url.URL, error) {
 	if req, ok := ctx.Value("url").(*url.URL); ok {
 		req.Host = hostname
+		req.Scheme = "https"
 		fmt.Println(req.String())
 		return req, nil
 	}
