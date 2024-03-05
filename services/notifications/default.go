@@ -13,7 +13,6 @@ import (
 	"sync"
 
 	webpush "github.com/SherClockHolmes/webpush-go"
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/will-lol/personalWebsiteAwesome/dependencies/db"
 )
@@ -127,21 +126,18 @@ func (n notificationsService) Notify() (err error) {
 
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(*subscribers))
-	n.Log.Debug("notifying subscribers: ", "subscribers", *subscribers)
 	for _, subscriber := range *subscribers {
 		wg.Add(1)
 		go func(sub Subscription) {
 			defer wg.Done()
 			err := n.notifySubscriber(sub)
 			if err != nil {
-				n.Log.Debug("there was an err: " + err.Error())
 				errCh <- err
 			}
 		}(subscriber)
 	}
 
 	go func() {
-		n.Log.Debug("waiting")
 		wg.Wait()
 		close(errCh)
 	}()
@@ -156,14 +152,11 @@ func (n notificationsService) Notify() (err error) {
 }
 
 func (n notificationsService) notifySubscriber(sub Subscription) error {
-	n.Log.Debug("notify subscriber")
 	pub, err := n.GetPubKey()
 	priv, err := n.GetPrivKey()
 	if err != nil {
 		return err
 	}
-	n.Log.Debug("got keys")
-	n.Log.Debug("sending using webpush")
 	resp, err := webpush.SendNotification([]byte("Notification received"), &sub, &webpush.Options{
 		VAPIDPublicKey:  *pub,
 		VAPIDPrivateKey: *priv,
@@ -173,26 +166,19 @@ func (n notificationsService) notifySubscriber(sub Subscription) error {
 	if err != nil {
 		return err
 	}
-	n.Log.Debug("sent")
 	if resp.StatusCode == 410 {
-		n.Log.Debug("deleting")
 		n.db.DeleteObject(sub)
 	}
-	n.Log.Debug("returning after success...")
 	return nil
 }
 
 func (n notificationsService) Subscribe(sub Subscription) error {
-	n.Log.Debug("subscription", "subscription", sub)
-	n.Log.Debug("checking url validity")
 	_, err := url.ParseRequestURI(sub.Endpoint)
 	if len(sub.Endpoint) < 1 || err != nil {
 		n.Log.Error("Improper URL")
 		return errors.New("Improper URL")
 	}
-	n.Log.Debug("url valid")
 
-	n.Log.Debug("checking if obj exists")
 	alreadyExists, err := n.db.DoesKeyExist(map[string]types.AttributeValue{
 		"Endpoint": &types.AttributeValueMemberS{
 			Value: sub.Endpoint,
@@ -201,19 +187,15 @@ func (n notificationsService) Subscribe(sub Subscription) error {
 	if err != nil {
 		return err
 	}
-	n.Log.Debug("checked successfully")
 	if *alreadyExists {
 		n.Log.Error("Already exists")
 		return errors.New("Already exists")
 	}
-	n.Log.Debug("doesnt already exist")
 
-	n.Log.Debug("saving obj")
 	err = n.db.SaveObject(sub)
 	if err != nil {
 		n.Log.Error(err.Error())
 		return err
 	}
-	n.Log.Debug("saved")
 	return nil
 }

@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"errors"
-	"log/slog"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -51,7 +50,6 @@ func getTableName() (name string, err error) {
 
 // DoesObjExist returns whether an object found in the DB according to the given searchObj or an error. The searchObj is the desired object in the DB. It does not need to be complete, but should include the primary key in the database. 
 func (c db[T]) DoesKeyExist(searchObj map[string]types.AttributeValue) (*bool, error) {
-	slog.Default().Debug("getting item")
 	res, err := c.DynamoDbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
 		TableName: aws.String(c.TableName),
 		Key:       searchObj,
@@ -59,26 +57,21 @@ func (c db[T]) DoesKeyExist(searchObj map[string]types.AttributeValue) (*bool, e
 	if err != nil {
 		return nil, err
 	}
-	slog.Default().Debug("got item", "res", res)
 
 	exists := res.Item != nil
 	return &exists, nil
 }
 
 func (c db[T]) SaveObject(obj T) (err error) {
-	slog.Default().Debug("marshalling")
 	objAttributevalue, err := attributevalue.MarshalMap(obj)
 	if err != nil {
 		return err
 	}
-	slog.Default().Debug("marshalled", "obj", objAttributevalue)
 
-	slog.Default().Debug("putting item")
-	i, err := c.DynamoDbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
+	_, err = c.DynamoDbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
 		Item:      objAttributevalue,
 		TableName: aws.String(c.TableName),
 	})
-	slog.Default().Debug("put item, there may be errors", "item", i)
 	return err
 }
 
