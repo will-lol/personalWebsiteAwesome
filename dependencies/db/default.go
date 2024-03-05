@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -68,15 +69,19 @@ func (c db[T]) DoesObjExist(searchObj T) (*bool, error) {
 }
 
 func (c db[T]) SaveObject(obj T) (err error) {
+	slog.Default().Debug("marshalling")
 	objAttributevalue, err := attributevalue.MarshalMap(obj)
 	if err != nil {
 		return err
 	}
+	slog.Default().Debug("marshalled", "obj", objAttributevalue)
 
-	_, err = c.DynamoDbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
+	slog.Default().Debug("putting item")
+	i, err := c.DynamoDbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
 		Item:      objAttributevalue,
 		TableName: aws.String(c.TableName),
 	})
+	slog.Default().Debug("put item, there may be errors", "item", i)
 	return err
 }
 

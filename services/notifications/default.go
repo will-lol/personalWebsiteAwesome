@@ -181,26 +181,34 @@ func (n notificationsService) notifySubscriber(sub Subscription) error {
 }
 
 func (n notificationsService) Subscribe(sub Subscription) error {
+	n.Log.Debug("subscription", "subscription", sub)
+	n.Log.Debug("checking url validity")
 	_, err := url.ParseRequestURI(sub.Endpoint)
 	if len(sub.Endpoint) < 1 || err != nil {
 		n.Log.Error("Improper URL")
 		return errors.New("Improper URL")
 	}
+	n.Log.Debug("url valid")
 
+	n.Log.Debug("checking if obj exists")
 	alreadyExists, err := n.db.DoesObjExist(sub)
 	if err != nil {
 		n.Log.Error("Couldn't check subscription")
 		return errors.New("Couldn't check subscription")
 	}
+	n.Log.Debug("checked successfully")
 	if *alreadyExists {
 		n.Log.Error("Already exists")
 		return errors.New("Already exists")
 	}
+	n.Log.Debug("doesnt already exist")
 
+	n.Log.Debug("saving obj")
 	err = n.db.SaveObject(sub)
 	if err != nil {
 		n.Log.Error(err.Error())
 		return err
 	}
+	n.Log.Debug("saved")
 	return nil
 }
