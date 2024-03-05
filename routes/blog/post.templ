@@ -6,6 +6,7 @@ import (
 	"github.com/will-lol/personalWebsiteAwesome/services/eid"
 	"log/slog"
 	"time"
+	"github.com/will-lol/personalWebsiteAwesome/services/url"
 )
 
 templ postPage(blogPost *blogService.Post) {
@@ -16,6 +17,7 @@ templ postPage(blogPost *blogService.Post) {
 					@components.Date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "font-sans dt-published", "datetime": blogPost.Frontmatter.Date.Format(time.DateTime) })
 				</div>
 				<a hidden class="p-author h-card" href="https://will.forsale">William Bradshaw</a>
+				<a hidden class="u-url" href={ templ.URL(url.GetURLHandled(ctx).String()) }></a>
 				<div hidden class="p-summary">{ blogPost.Frontmatter.Description }</div>
 				@notByAi()
 			}
