@@ -125,22 +125,30 @@ func (n notificationsService) Notify() (err error) {
 
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(*subscribers))
+	n.Log.Debug("notifying subscribers: ", "subscribers", *subscribers)
 	for _, subscriber := range *subscribers {
 		wg.Add(1)
 		go func(sub Subscription) {
 			defer wg.Done()
 			err := n.notifySubscriber(sub)
 			if err != nil {
+				n.Log.Debug("there was an err: " + err.Error())
 				errCh <- err
 			}
 		}(subscriber)
 	}
-	wg.Wait()
+
+	go func() {
+		n.Log.Debug("waiting")
+		wg.Wait()
+		close(errCh)
+	}()
 
 	for err := range errCh {
 		return err
 	}
 
+	wg.Wait()
 	n.Log.Info("Notified subscribers")
 	return
 }
@@ -168,6 +176,7 @@ func (n notificationsService) notifySubscriber(sub Subscription) error {
 		n.Log.Debug("deleting")
 		n.db.DeleteObject(sub)
 	}
+	n.Log.Debug("returning after success...")
 	return nil
 }
 
