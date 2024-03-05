@@ -193,8 +193,7 @@ func (n notificationsService) Subscribe(sub Subscription) error {
 	n.Log.Debug("checking if obj exists")
 	alreadyExists, err := n.db.DoesObjExist(sub)
 	if err != nil {
-		n.Log.Error("Couldn't check subscription")
-		return errors.New("Couldn't check subscription")
+		return err
 	}
 	n.Log.Debug("checked successfully")
 	if *alreadyExists {
