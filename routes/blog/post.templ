@@ -14,6 +14,7 @@ templ postPage(blogPost *blogService.Post) {
 				<div class="text-base text-warm-700">
 					@components.Date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "font-sans" })
 				</div>
+				@notByAi()
 			}
 			@components.Prose() {
 				@templ.Raw(blogPost.Content)
@@ -22,3 +23,6 @@ templ postPage(blogPost *blogService.Post) {
 	}
 }
 
+templ notByAi() {
+	<a href="https://notbyai.fyi"><img src="/assets/images/ai.svg" alt="Written by Human, Not by AI"/></a>
+}
