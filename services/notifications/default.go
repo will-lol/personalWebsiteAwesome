@@ -13,6 +13,8 @@ import (
 	"sync"
 
 	webpush "github.com/SherClockHolmes/webpush-go"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/will-lol/personalWebsiteAwesome/dependencies/db"
 )
 
@@ -191,7 +193,11 @@ func (n notificationsService) Subscribe(sub Subscription) error {
 	n.Log.Debug("url valid")
 
 	n.Log.Debug("checking if obj exists")
-	alreadyExists, err := n.db.DoesObjExist(sub)
+	alreadyExists, err := n.db.DoesKeyExist(map[string]types.AttributeValue{
+		"Endpoint": &types.AttributeValueMemberS{
+			Value: sub.Endpoint,
+		},
+	})
 	if err != nil {
 		return err
 	}
