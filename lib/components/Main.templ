@@ -5,7 +5,7 @@ import (
 )
 
 templ Main(attrs templ.Attributes) {
-	<div { merge.MergeAttrs(attrs, templ.Attributes{"class": "max-w-prose mx-auto px-3 py-2"})... } >
+	<article { merge.MergeAttrs(attrs, templ.Attributes{"class": "max-w-prose mx-auto px-3 py-2"})... } >
 		{ children... }
-	</div>
+	</article>
 }

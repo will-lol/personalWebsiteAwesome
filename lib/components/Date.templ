@@ -6,9 +6,9 @@ import (
 )
 
 templ Date(date time.Time, id string, attrs templ.Attributes) {
-	<span { merge.MergeAttrs(attrs, templ.Attributes{ "id": id })... }>
+	<time { merge.MergeAttrs(attrs, templ.Attributes{ "id": id })... }>
 		@dateFiller(id, date)
-	</span>
+	</time>
 }
 
 script dateFiller(id string, date time.Time) {

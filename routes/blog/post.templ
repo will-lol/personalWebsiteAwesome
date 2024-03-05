@@ -9,14 +9,16 @@ import (
 
 templ postPage(blogPost *blogService.Post) {
 	@components.Layout(blogPost.Frontmatter.Title) {
-		@components.Main(templ.Attributes{}) {
+		@components.Main(templ.Attributes{"class": "h-entry"}) {
 			@components.Header(blogPost.Frontmatter.Title) {
 				<div class="text-base text-warm-700">
 					@components.Date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "font-sans" })
 				</div>
+				<a hidden class="p-author h-card" href="https://will.forsale">William Bradshaw</a>
+				<div hidden class="p-summary">{ blogPost.Frontmatter.Description }</div>
 				@notByAi()
 			}
-			@components.Prose() {
+			@components.Prose(templ.Attributes{"class": "e-content"}) {
 				@templ.Raw(blogPost.Content)
 			}
 		}

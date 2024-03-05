@@ -23,7 +23,7 @@ templ index(i icon.IconFinder) {
 		</div>
 		@components.Main(templ.Attributes{"class": "flex flex-col gap-2"}) {
 			@hCard()
-			@components.Prose() {
+			@components.Prose(templ.Attributes{}) {
 				<p>
 					Hello, I'm Will. I'm a software developer and I built this website that can send me push notifications. Go ahead, try it: 
 					@components.LoaderButton(templ.Attributes{ "hx-get": "/api/notifications/notify" }, "Sending...") {
