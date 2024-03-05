@@ -5,6 +5,7 @@ import (
 	"github.com/will-lol/personalWebsiteAwesome/lib/components"
 	"github.com/will-lol/personalWebsiteAwesome/services/eid"
 	"log/slog"
+	"time"
 )
 
 templ postPage(blogPost *blogService.Post) {
@@ -12,7 +13,7 @@ templ postPage(blogPost *blogService.Post) {
 		@components.Main(templ.Attributes{"class": "h-entry"}) {
 			@components.Header(blogPost.Frontmatter.Title) {
 				<div class="text-base text-warm-700">
-					@components.Date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "font-sans" })
+					@components.Date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "font-sans dt-published", "datetime": blogPost.Frontmatter.Date.Format(time.DateTime) })
 				</div>
 				<a hidden class="p-author h-card" href="https://will.forsale">William Bradshaw</a>
 				<div hidden class="p-summary">{ blogPost.Frontmatter.Description }</div>
