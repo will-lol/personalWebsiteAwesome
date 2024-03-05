@@ -51,11 +51,14 @@ func getTableName() (name string, err error) {
 
 // DoesObjExist returns whether an object found in the DB according to the given searchObj or an error. The searchObj is the desired object in the DB. It does not need to be complete, but should include the primary key in the database.
 func (c db[T]) DoesObjExist(searchObj T) (*bool, error) {
+	slog.Default().Debug("marshalling", "obj", searchObj)
 	attributeValueObj, err := attributevalue.MarshalMap(searchObj)
 	if err != nil {
 		return nil, err
 	}
+	slog.Default().Debug("marshalled", "obj", attributeValueObj)
 
+	slog.Default().Debug("getting item")
 	res, err := c.DynamoDbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
 		TableName: aws.String(c.TableName),
 		Key:       attributeValueObj,
@@ -63,6 +66,7 @@ func (c db[T]) DoesObjExist(searchObj T) (*bool, error) {
 	if err != nil {
 		return nil, err
 	}
+	slog.Default().Debug("got item", "res", res)
 
 	exists := res.Item != nil
 	return &exists, nil
