@@ -7,7 +7,7 @@ import (
 	"net/url"
 )
 
-const hostname = "will.forsale"
+const hostname = "w.bradshaw.page"
 
 func GetURL(ctx context.Context) (*url.URL, error) {
 	if req, ok := ctx.Value("url").(*url.URL); ok {

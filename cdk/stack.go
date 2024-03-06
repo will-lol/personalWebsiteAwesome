@@ -121,7 +121,7 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 	cf := awscloudfront.NewDistribution(stack, jsii.String("customerFacing"), &awscloudfront.DistributionProps{
 		HttpVersion: awscloudfront.HttpVersion_HTTP2_AND_3,
 		Certificate: cert,
-		DomainNames: jsii.Strings("will.forsale", "www.will.forsale"),
+		DomainNames: jsii.Strings("w.bradshaw.page"),
 		DefaultBehavior: &awscloudfront.BehaviorOptions{
 			AllowedMethods:       awscloudfront.AllowedMethods_ALLOW_ALL(),
 			Origin:               lambdaOrigin,
