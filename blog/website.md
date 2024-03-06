@@ -1,5 +1,5 @@
 ---
-title: What I learnt building will.forsale in Go
+title: What I learnt building w.bradshaw.page in Go
 date: 2024-02-20
 slug: website
 description: >

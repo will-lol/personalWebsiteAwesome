@@ -10,8 +10,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
-	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
-	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53targets"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3deployment"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awssecretsmanager"
@@ -22,9 +20,7 @@ import (
 )
 
 const githubRepo = "will-lol/personalWebsiteAwesome"
-const route53ZoneId = "Z02978271FWSW4APEXXR7"
-const route53ZoneName = "will.forsale"
-const certificateArn = "arn:aws:acm:us-east-1:301436506805:certificate/8ffebb3c-d608-4f0a-bbb7-4b6e1b1b23c1"
+const certificateArn = "arn:aws:acm:us-east-1:301436506805:certificate/255652a8-d581-4039-a165-ea4436acf977"
 const vapidSecretsArn = "arn:aws:secretsmanager:ap-southeast-2:301436506805:secret:website/vapid-keys-WIfxAO"
 
 type CommandHook struct{}
@@ -176,19 +172,6 @@ func NewWebsiteStack(scope constructs.Construct, id string, props awscdk.StackPr
 		Sources: &[]awss3deployment.ISource{
 			awss3deployment.Source_Asset(jsii.String("../blog"), nil),
 		},
-	})
-
-	hostedZone := awsroute53.PublicHostedZone_FromPublicHostedZoneAttributes(stack, jsii.String(route53ZoneId), &awsroute53.PublicHostedZoneAttributes{
-		HostedZoneId: jsii.String(route53ZoneId),
-		ZoneName:     jsii.String(route53ZoneName),
-	})
-	awsroute53.NewARecord(stack, jsii.String("CfRecordA"), &awsroute53.ARecordProps{
-		Zone:   hostedZone,
-		Target: awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(cf)),
-	})
-	awsroute53.NewAaaaRecord(stack, jsii.String("CfRecordAaaa"), &awsroute53.AaaaRecordProps{
-		Zone:   hostedZone,
-		Target: awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(cf)),
 	})
 
 	// GitHub actions config
