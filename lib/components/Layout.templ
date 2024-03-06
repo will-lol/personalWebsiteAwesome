@@ -1,15 +1,16 @@
 package components
 
-
 templ Layout(title string) {
 	<!DOCTYPE html>
 	<html>
 		<head>
 			<title>{ title + "—W. Bradshaw" }</title>
 			<script src="/assets/js/htmx.min.js"></script>
-			<script type="module" src="/assets/js/util/components/sw-register.js"></script>
-			<script type="module" src="/assets/js/util/errors.js"></script>
+			<script type="module" src="/assets/js/lib/components/sw-register.js"></script>
+			<script type="module" src="/assets/js/lib/errors.js"></script>
 			<link rel="manifest" href="/assets/manifest.webmanifest"/>
+			<link rel="authorization_endpoint" href="https://indieauth.com/auth"/>
+			<link rel="token_endpoint" href="https://tokens.indieauth.com/token"/>
 			<meta name="mobile-web-app-capable" content="yes"/>
 			<meta name="apple-mobile-web-app-capable" content="yes"/>
 			<meta name="application-name" content="Bradshaw"/>

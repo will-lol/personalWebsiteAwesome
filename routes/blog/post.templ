@@ -5,20 +5,29 @@ import (
 	"github.com/will-lol/personalWebsiteAwesome/lib/components"
 	"github.com/will-lol/personalWebsiteAwesome/services/eid"
 	"log/slog"
+	"time"
+	"github.com/will-lol/personalWebsiteAwesome/services/url"
 )
 
 templ postPage(blogPost *blogService.Post) {
 	@components.Layout(blogPost.Frontmatter.Title) {
-		@components.Main(templ.Attributes{}) {
+		@components.Main(templ.Attributes{"class": "h-entry"}) {
 			@components.Header(blogPost.Frontmatter.Title) {
 				<div class="text-base text-warm-700">
-					@components.Date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "font-sans" })
+					@components.Date(blogPost.Frontmatter.Date, eid.GetNextHandled(ctx, slog.Default()), templ.Attributes{ "class": "font-sans dt-published", "datetime": blogPost.Frontmatter.Date.Format(time.DateTime) })
 				</div>
+				<a hidden class="p-author h-card" href="https://will.forsale">William Bradshaw</a>
+				<a hidden class="u-url" href={ templ.URL(url.GetURLHandled(ctx).String()) }></a>
+				<div hidden class="p-summary">{ blogPost.Frontmatter.Description }</div>
+				@notByAi()
 			}
-			@components.Prose() {
+			@components.Prose(templ.Attributes{"class": "e-content"}) {
 				@templ.Raw(blogPost.Content)
 			}
 		}
 	}
 }
 
+templ notByAi() {
+	<a href="https://notbyai.fyi"><img src="/assets/images/ai.svg" alt="Written by Human, Not by AI"/></a>
+}

@@ -10,8 +10,10 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"sync"
 
 	webpush "github.com/SherClockHolmes/webpush-go"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/will-lol/personalWebsiteAwesome/dependencies/db"
 )
 
@@ -33,8 +35,8 @@ type notificationsService struct {
 
 func NewNotificationsService(l *slog.Logger, d db.DB[Subscription]) (*notificationsService, error) {
 	return &notificationsService{
-		Log:       l,
-		db:        d,
+		Log: l,
+		db:  d,
 	}, nil
 }
 
@@ -99,7 +101,7 @@ func (n notificationsService) GetPubKey() (key *string, err error) {
 	}
 	n.vapidPub, n.vapidPriv, err = n.getSecrets()
 	if err != nil {
-		return nil, err 
+		return nil, err
 	}
 	return n.vapidPub, nil
 }
@@ -110,7 +112,7 @@ func (n notificationsService) GetPrivKey() (key *string, err error) {
 	}
 	n.vapidPub, n.vapidPriv, err = n.getSecrets()
 	if err != nil {
-		return nil, err 
+		return nil, err
 	}
 	return n.vapidPriv, nil
 }
@@ -122,9 +124,29 @@ func (n notificationsService) Notify() (err error) {
 		return err
 	}
 
+	var wg sync.WaitGroup
+	errCh := make(chan error, len(*subscribers))
 	for _, subscriber := range *subscribers {
-		go n.notifySubscriber(subscriber)
+		wg.Add(1)
+		go func(sub Subscription) {
+			defer wg.Done()
+			err := n.notifySubscriber(sub)
+			if err != nil {
+				errCh <- err
+			}
+		}(subscriber)
 	}
+
+	go func() {
+		wg.Wait()
+		close(errCh)
+	}()
+
+	for err := range errCh {
+		return err
+	}
+
+	wg.Wait()
 	n.Log.Info("Notified subscribers")
 	return
 }
@@ -157,10 +179,13 @@ func (n notificationsService) Subscribe(sub Subscription) error {
 		return errors.New("Improper URL")
 	}
 
-	alreadyExists, err := n.db.DoesObjExist(sub)
+	alreadyExists, err := n.db.DoesKeyExist(map[string]types.AttributeValue{
+		"Endpoint": &types.AttributeValueMemberS{
+			Value: sub.Endpoint,
+		},
+	})
 	if err != nil {
-		n.Log.Error("Couldn't check subscription")
-		return errors.New("Couldn't check subscription")
+		return err
 	}
 	if *alreadyExists {
 		n.Log.Error("Already exists")

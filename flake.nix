@@ -33,7 +33,7 @@
 	  src = ./.;
 	  CGO_ENABLED = 0;
 	  ldflags = ["-s -w"];
-	  vendorHash = "sha256-BQrz/+1KopDxZr2ZmvoFXL36cwCdBJMsemkRsFFl9VM=";
+	  vendorHash = "sha256-54WH1NFO8fqVpINFWeBJZjh5Rn7H0lyOuiQclFP4Hx4=";
 	  preBuild = ''
 	    ${templ}/bin/templ generate
 	  '';

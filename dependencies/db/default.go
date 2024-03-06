@@ -19,7 +19,7 @@ type db[T any] struct {
 
 type DB[T any] interface {
 	DeleteObject(T) error
-	DoesObjExist(T) (*bool, error)
+	DoesKeyExist(map[string]types.AttributeValue) (*bool, error)
 	GetObjects() (*[]T, error)
 	SaveObject(T) (error)
 }
@@ -48,16 +48,11 @@ func getTableName() (name string, err error) {
 	return name, err
 }
 
-// DoesObjExist returns whether an object found in the DB according to the given searchObj or an error. The searchObj is the desired object in the DB. It does not need to be complete, but should include the primary key in the database.
-func (c db[T]) DoesObjExist(searchObj T) (*bool, error) {
-	attributeValueObj, err := attributevalue.MarshalMap(searchObj)
-	if err != nil {
-		return nil, err
-	}
-
+// DoesObjExist returns whether an object found in the DB according to the given searchObj or an error. The searchObj is the desired object in the DB. It does not need to be complete, but should include the primary key in the database. 
+func (c db[T]) DoesKeyExist(searchObj map[string]types.AttributeValue) (*bool, error) {
 	res, err := c.DynamoDbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
 		TableName: aws.String(c.TableName),
-		Key:       attributeValueObj,
+		Key:       searchObj,
 	})
 	if err != nil {
 		return nil, err

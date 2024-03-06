@@ -9,7 +9,6 @@ import (
 
 	"encoding/json"
 	"io"
-	"log"
 )
 
 type notificationsHandler struct {
@@ -33,7 +32,6 @@ func (n notificationsHandler) Router(r chi.Router) {
 func (n notificationsHandler) subscribeHandler(w http.ResponseWriter, r *http.Request) {
 	subscriptionBytes, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Fatalln(err)
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
 		return
@@ -41,7 +39,11 @@ func (n notificationsHandler) subscribeHandler(w http.ResponseWriter, r *http.Re
 	var subscription notifications.Subscription
 	json.Unmarshal(subscriptionBytes, &subscription)
 
-	n.NotificationsService.Subscribe(subscription)
+	err = n.NotificationsService.Subscribe(subscription)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+	}
 }
 
 func (n notificationsHandler) notifyHandler(w http.ResponseWriter, r *http.Request) {
