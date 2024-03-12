@@ -7,7 +7,7 @@ description: >
 ---
 In 2006, AWS launched three products. Two of them changed computing. S3 and EC2 introduced the idea of 'the cloud' to developers. A concept that elucidates ideas of magical, floating computers that are everywhere you need them to be. SQS was also released-someone might argue its equal importance. 
 
-Until the popularisation of edge computing by Vercel, computers remained physically planted. It was obvious to both developers and Australians that the computers they interacted with in (mostly) US-East-1 were definitely not omnipresent. While possible before, edge computing made the idea of running arbitrary code on a server close to your users very easy-and fast. I think this magical experience realised the concept of 'the cloud', but do you really need it for your side project of 3 users?
+Until the popularisation of edge computing by Vercel, computers seemed to remain physically planted. It was obvious to both developers and Australians that the computers they interacted with in (mostly) US-East-1 were definitely not omnipresent. While possible before, edge computing made the idea of running arbitrary code on a server close to your users very easy-and fast. I think this magical experience realised the concept of 'the cloud', but do you really need it for your side project of 3 users?
 
 No. In fact, I think 'the edge' is rather limited. 
 
@@ -15,11 +15,11 @@ Vercel's 'edge' is currently being used primarily for the server side rendering 
 
 As opposed to a static approach, server side rendering provides one main benefit: dynamic content insertion in the files themselves. This might reduce the amount of time it takes for a user to see a fully rendered page. Running your servers 'at the edge' will provide even greater benefits.
 
-A static approach however will always show a visual result (if incomplete) before server side rendering can. If data fetching is well handled, then API requests to our slow(er) serverless endpoints shouldn't be so detrimental. After all, the user can at least see a placeholder or loading bar.
+A static approach using a CDN however will always show a visual result (if incomplete) before server side rendering can. If data fetching is well handled, then API requests to our slow(er) serverless endpoints shouldn't be so detrimental. After all, the user can at least see a placeholder or loading bar.
 
 Where the dynamic data is not critical, traditional serverless computing could be combined with a caching layer to provide outdated information that could be updated on the client. If practical, the cache could even be invalidated when the data changes. In this scenario, using edge means that users no longer see incorrect information for a split second while the page loads-an improvement so small the three fold increase in price makes unfeasible.
 
-Most implementations of edge computing are limited to JavaScript runtimes. In **almost all** cases, developers will find themselves making requests to other servers from the edge runtime. If you *could* have made the request in a JavaScript runtime, why make the client wait for your server when it could be showing indications of progress? Many of these endpoints may not be running on the edge, nullifying its benefits for clients who could handle the request with similar speed.
+Most implementations of edge computing are limited to JavaScript runtimes. In **almost all** cases, developers will find themselves making requests to other servers from the edge runtime. Why are we delaying the generation of HTML with requests we can make on the client, where we can show an indication of progress? Many of these endpoints may not be running on the edge, nullifying its benefits for clients who could handle the request with similar speed.
 
 If at some point a client's request must travel across oceans to reach its destination, I think this is better done after an HTML response has been served than before.
 
