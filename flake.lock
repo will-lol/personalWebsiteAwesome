@@ -3,13 +3,14 @@
     "aws-cdk": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-tcrB43K3OVM4cqiPhE1eAbiMIF2x/abOk/suhz/zGqE=",
+        "lastModified": 1714198929,
+        "narHash": "sha256-fryxprH1L806+QQhmJcJDnghkS7JjKPfUwj2ajWy514=",
         "type": "tarball",
-        "url": "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.124.0.tgz"
+        "url": "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.139.0.tgz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.124.0.tgz"
+        "url": "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.139.0.tgz"
       }
     },
     "flake-utils": {

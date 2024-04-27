@@ -6,7 +6,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     templRepo.url = "github:a-h/templ/refs/tags/v0.2.543";
     aws-cdk = {
-      url = "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.124.0.tgz";
+      url = "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.139.0.tgz";
       flake = false;
     };
   };
