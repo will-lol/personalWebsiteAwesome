@@ -20,7 +20,7 @@
 	  src = ./.;
 	  CGO_ENABLED = 0;
 	  ldflags = ["-s -w"];
-	  vendorHash = "sha256-54WH1NFO8fqVpINFWeBJZjh5Rn7H0lyOuiQclFP4Hx4=";
+	  vendorHash = "sha256-zAyiFzEHTmFwWSoqcfm4HMbc+CBkhr22Kar286JTipE=";
 	  preBuild = ''
 	    ${templ}/bin/templ generate
 	  '';
